@@ -1,0 +1,3408 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="dark" data-font="cairo">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0a0a0a">
+<meta name="description" content="FoxKio Movies — منصة أفلام وأنمي آمنة">
+<title>FoxKio Movies</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=Tajawal:wght@400;500;700;800&family=Amiri:wght@400;700&family=Readex+Pro:wght@400;500;700&family=IBM+Plex+Sans+Arabic:wght@400;500;700&family=Almarai:wght@400;700;800&display=swap" rel="stylesheet">
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+:root, [data-theme="dark"]{
+  --bg:#0a0a0a; --bg-2:#121212; --bg-3:#1a1a1a;
+  --surface:#161616; --surface-2:#1f1f1f; --surface-3:#262626;
+  --border:#2a2a2a; --border-soft:#1e1e1e;
+  --primary:#e50914; --primary-hover:#f6121d; --primary-dim:#9b0610;
+  --primary-glow:rgba(229,9,20,.35);
+  --text:#f5f5f5; --text-dim:#a8a8a8; --text-muted:#6b6b6b;
+  --success:#22c55e; --danger:#ef4444; --warning:#f59e0b;
+  --gradient:linear-gradient(135deg,#e50914,#9b0610);
+  --radius:14px; --radius-sm:10px; --radius-lg:20px;
+  --shadow-sm:0 2px 8px rgba(0,0,0,.35);
+  --shadow:0 8px 24px rgba(0,0,0,.5);
+  --shadow-lg:0 20px 60px rgba(0,0,0,.7);
+  --shadow-primary:0 8px 32px rgba(229,9,20,.25);
+  --ease:cubic-bezier(.16,1,.3,1);
+}
+[data-theme="light"]{
+  --bg:#f8fafc; --bg-2:#ffffff; --bg-3:#f1f5f9;
+  --surface:#ffffff; --surface-2:#f1f5f9; --surface-3:#e2e8f0;
+  --border:#e2e8f0; --border-soft:#f1f5f9;
+  --primary:#0ea5e9; --primary-hover:#0284c7; --primary-dim:#0369a1;
+  --primary-glow:rgba(14,165,233,.25);
+  --text:#0f172a; --text-dim:#475569; --text-muted:#94a3b8;
+  --success:#16a34a; --danger:#dc2626; --warning:#d97706;
+  --gradient:linear-gradient(135deg,#0ea5e9,#0369a1);
+  --shadow-sm:0 2px 8px rgba(15,23,42,.06);
+  --shadow:0 8px 24px rgba(15,23,42,.1);
+  --shadow-lg:0 20px 60px rgba(15,23,42,.15);
+  --shadow-primary:0 8px 32px rgba(14,165,233,.2);
+}
+[data-font="cairo"]{ --font-family:'Cairo','Segoe UI',system-ui,sans-serif; }
+[data-font="tajawal"]{ --font-family:'Tajawal','Segoe UI',system-ui,sans-serif; }
+[data-font="amiri"]{ --font-family:'Amiri','Segoe UI',system-ui,serif; }
+[data-font="readex"]{ --font-family:'Readex Pro','Segoe UI',system-ui,sans-serif; }
+[data-font="plex"]{ --font-family:'IBM Plex Sans Arabic','Segoe UI',system-ui,sans-serif; }
+[data-font="almarai"]{ --font-family:'Almarai','Segoe UI',system-ui,sans-serif; }
+[data-font="system"]{ --font-family:'Segoe UI',system-ui,-apple-system,sans-serif; }
+*{ margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+html,body{ height:100%; }
+body{
+  font-family:var(--font-family); background:var(--bg); color:var(--text);
+  font-size:15px; line-height:1.6; overflow-x:hidden;
+  transition:background .3s,color .3s; -webkit-font-smoothing:antialiased;
+}
+body.no-scroll{ overflow:hidden; }
+button,input,textarea,select{ font-family:inherit; font-size:inherit; color:inherit; }
+button{ cursor:pointer; border:none; background:none; color:inherit; }
+button:disabled{ cursor:not-allowed; opacity:.5; }
+a{ color:var(--primary); text-decoration:none; }
+a:hover{ text-decoration:underline; }
+img{ max-width:100%; display:block; }
+input,textarea,select{ outline:none; }
+::-webkit-scrollbar{ width:10px; height:10px; }
+::-webkit-scrollbar-track{ background:transparent; }
+::-webkit-scrollbar-thumb{ background:var(--border); border-radius:10px; }
+::-webkit-scrollbar-thumb:hover{ background:var(--primary-dim); }
+.svg-sprite{ position:absolute; width:0; height:0; overflow:hidden; }
+.icon{ width:1.2em; height:1.2em; display:inline-block; vertical-align:-.22em; fill:currentColor; flex-shrink:0; }
+.icon-lg{ width:1.5em; height:1.5em; }
+.icon-xl{ width:2em; height:2em; }
+.icon-sm{ width:1em; height:1em; }
+.icon-btn{
+  width:42px; height:42px; border-radius:50%;
+  display:inline-flex; align-items:center; justify-content:center;
+  background:var(--surface-2); transition:background .2s,transform .15s;
+  flex-shrink:0; border:1px solid var(--border);
+}
+.icon-btn:hover{ background:var(--surface-3); }
+.icon-btn:active{ transform:scale(.94); }
+.icon-btn.primary{ background:var(--gradient); color:#fff; border-color:transparent; }
+.icon-btn.primary:hover{ box-shadow:var(--shadow-primary); }
+.field{
+  width:100%; padding:12px 16px;
+  background:var(--surface-2); border:1px solid var(--border);
+  border-radius:var(--radius-sm); color:var(--text);
+  transition:border-color .2s,box-shadow .2s; font-size:15px;
+}
+.field:focus{ border-color:var(--primary); box-shadow:0 0 0 3px var(--primary-glow); }
+.field::placeholder{ color:var(--text-muted); }
+textarea.field{ resize:vertical; min-height:90px; font-family:inherit; }
+select.field{ cursor:pointer; }
+.btn{
+  display:inline-flex; align-items:center; justify-content:center; gap:8px;
+  padding:12px 22px; border-radius:var(--radius-sm);
+  font-weight:700; font-size:15px;
+  transition:transform .2s var(--ease),box-shadow .25s,background .2s;
+  border:1px solid transparent; white-space:nowrap;
+}
+.btn:active{ transform:scale(.96); }
+.btn.primary{ background:var(--gradient); color:#fff; box-shadow:var(--shadow-primary); }
+.btn.primary:hover{ box-shadow:0 12px 40px var(--primary-glow); transform:translateY(-1px); }
+.btn.ghost{ background:var(--surface-2); color:var(--text); border-color:var(--border); }
+.btn.ghost:hover{ background:var(--surface-3); border-color:var(--primary); }
+.btn.danger{ background:var(--danger); color:#fff; }
+.btn.success{ background:var(--success); color:#fff; }
+.btn.sm{ padding:8px 16px; font-size:13px; }
+.btn.block{ width:100%; }
+.btn.icon-only{ padding:0; width:44px; height:44px; border-radius:50%; }
+.card{ background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:20px; }
+.err{ color:var(--danger); font-size:13px; min-height:20px; margin-top:6px; }
+.ok{ color:var(--success); font-size:13px; min-height:20px; margin-top:6px; }
+.muted{ color:var(--text-dim); font-size:13px; }
+.tiny{ font-size:11px; color:var(--text-muted); }
+.tabs{ display:flex; gap:6px; background:var(--surface-2); padding:6px; border-radius:var(--radius-sm); margin-bottom:18px; }
+.tabs button{ flex:1; padding:10px 14px; border-radius:8px; font-weight:600; color:var(--text-dim); transition:.2s var(--ease); font-size:14px; }
+.tabs button.active{ background:var(--gradient); color:#fff; box-shadow:var(--shadow-sm); }
+#toastContainer{
+  position:fixed; bottom:24px; left:50%; transform:translateX(-50%);
+  z-index:10000; display:flex; flex-direction:column; gap:8px;
+  pointer-events:none; align-items:center; max-width:90vw;
+}
+.toast{
+  background:var(--surface); border:1px solid var(--border);
+  padding:12px 20px; border-radius:10px; font-size:14px; font-weight:600;
+  box-shadow:var(--shadow); animation:toastIn .35s var(--ease);
+  pointer-events:auto; min-width:220px; text-align:center;
+  display:flex; align-items:center; gap:10px; justify-content:center;
+}
+.toast.success{ border-color:var(--success); color:var(--success); }
+.toast.error{ border-color:var(--danger); color:var(--danger); }
+.toast.info{ border-color:var(--primary); color:var(--primary); }
+@keyframes toastIn{ from{ opacity:0; transform:translateY(20px) scale(.95); } to{ opacity:1; transform:none; } }
+
+#splashScreen{
+  position:fixed; inset:0; z-index:99999;
+  display:flex; align-items:center; justify-content:center; flex-direction:column;
+  background:
+    radial-gradient(circle at 20% 20%, var(--primary-glow), transparent 50%),
+    radial-gradient(circle at 80% 80%, var(--primary-glow), transparent 50%),
+    var(--bg);
+  transition:opacity .4s var(--ease), visibility .4s var(--ease);
+}
+#splashScreen.hidden{ opacity:0; visibility:hidden; pointer-events:none; }
+.splash-logo{ width:88px; height:88px; margin-bottom:16px; animation:pulse 1.6s ease-in-out infinite; }
+.splash-title{ font-size:22px; font-weight:800; margin-bottom:20px; background:var(--gradient); -webkit-background-clip:text; background-clip:text; color:transparent; }
+@keyframes pulse{ 0%,100%{ transform:scale(1); } 50%{ transform:scale(1.06); } }
+
+.screen{ position:fixed; inset:0; opacity:0; pointer-events:none; visibility:hidden; transition:opacity .35s var(--ease),visibility .35s; z-index:1; display:flex; overflow:auto; }
+.screen.active{ opacity:1; pointer-events:auto; visibility:visible; }
+#authScreen{ align-items:center; justify-content:center; padding:24px 16px; background:radial-gradient(circle at 20% 20%, var(--primary-glow), transparent 50%), radial-gradient(circle at 80% 80%, var(--primary-glow), transparent 50%), var(--bg); }
+.auth-card{ width:min(440px, 100%); background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); padding:36px 28px; box-shadow:var(--shadow-lg); position:relative; animation:modalIn .5s var(--ease); }
+.auth-card::before{ content:''; position:absolute; top:0; left:0; right:0; height:3px; background:var(--gradient); border-radius:var(--radius-lg) var(--radius-lg) 0 0; }
+.auth-logo{ width:72px; height:72px; margin:0 auto 14px; display:block; }
+.auth-title{ text-align:center; font-size:26px; font-weight:800; margin-bottom:4px; background:var(--gradient); -webkit-background-clip:text; background-clip:text; color:transparent; }
+.auth-sub{ text-align:center; color:var(--text-muted); font-size:13px; margin-bottom:22px; }
+.auth-form{ display:none; }
+.auth-form.active{ display:block; animation:fadeIn .35s var(--ease); }
+.auth-form .field{ margin-bottom:12px; }
+@keyframes fadeIn{ from{ opacity:0; transform:translateY(8px); } to{ opacity:1; transform:none; } }
+.auth-actions{ display:flex; justify-content:space-between; align-items:center; margin:8px 0 14px; font-size:13px; }
+.link-btn{ color:var(--primary); font-size:13px; padding:4px 0; text-align:center; width:100%; }
+.link-btn:hover{ text-decoration:underline; }
+#appScreen{ z-index:2; }
+.app-shell{ display:flex; width:100%; min-height:100vh; position:relative; }
+.sidebar{ width:240px; flex-shrink:0; background:var(--bg-2); border-left:1px solid var(--border); padding:18px 12px; display:flex; flex-direction:column; gap:4px; position:sticky; top:0; height:100vh; overflow-y:auto; }
+.sidebar-brand{ display:flex; align-items:center; gap:10px; padding:0 8px 16px; margin-bottom:8px; border-bottom:1px solid var(--border-soft); }
+.sidebar-brand img{ width:36px; height:36px; border-radius:8px; }
+.sidebar-brand span{ font-weight:800; font-size:16px; }
+.nav-btn{ display:flex; align-items:center; gap:12px; padding:11px 14px; border-radius:10px; font-size:14px; font-weight:600; color:var(--text-dim); transition:background .2s var(--ease),color .2s,transform .15s; text-align:right; width:100%; position:relative; }
+.nav-btn:hover{ background:var(--surface-2); color:var(--text); }
+.nav-btn.active{ background:var(--gradient); color:#fff; box-shadow:var(--shadow-primary); }
+.nav-btn:active{ transform:scale(.98); }
+.sidebar-spacer{ flex:1; min-height:12px; }
+.sidebar-divider{ height:1px; background:var(--border-soft); margin:8px 4px; }
+.main{ flex:1; display:flex; flex-direction:column; min-width:0; }
+.topbar{ position:sticky; top:0; z-index:20; background:color-mix(in srgb, var(--bg) 88%, transparent); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px); border-bottom:1px solid var(--border); padding:12px 20px; display:flex; align-items:center; gap:12px; }
+.topbar-brand{ display:none; align-items:center; gap:8px; font-weight:800; }
+.topbar-brand img{ width:28px; height:28px; border-radius:6px; }
+.topbar-search{ flex:1; max-width:400px; position:relative; }
+.topbar-search .field{ padding-right:44px; }
+.topbar-search .icon{ position:absolute; top:50%; right:14px; transform:translateY(-50%); color:var(--text-muted); pointer-events:none; }
+.topbar-actions{ display:flex; gap:8px; align-items:center; margin-right:auto; }
+.avatar-sm{ width:38px; height:38px; border-radius:50%; object-fit:cover; border:2px solid var(--border); background:var(--surface-2); cursor:pointer; transition:transform .2s var(--ease), border-color .2s; }
+.avatar-sm:hover{ border-color:var(--primary); transform:scale(1.06); }
+.avatar-sm:active{ transform:scale(.95); }
+
+.connection-status{
+  display:none; align-items:center; gap:6px;
+  padding:6px 12px; border-radius:20px; font-size:12px; font-weight:700;
+  background:rgba(239,68,68,.15); color:var(--danger);
+  border:1px solid var(--danger); animation:fadeIn .3s;
+}
+.connection-status.show{ display:flex; }
+.connection-status .dot{
+  width:8px; height:8px; border-radius:50%;
+  background:var(--danger); animation:pulse-dot 1.4s infinite;
+}
+@keyframes pulse-dot{ 0%,100%{ opacity:1; } 50%{ opacity:.4; } }
+
+.skeleton{ background:linear-gradient(90deg, var(--surface-2) 25%, var(--surface-3) 50%, var(--surface-2) 75%); background-size:200% 100%; animation:skel 1.4s infinite; border-radius:8px; }
+@keyframes skel{ 0%{ background-position:200% 0; } 100%{ background-position:-200% 0; } }
+
+.content{ flex:1; padding:20px; padding-bottom:80px; overflow-y:auto; }
+.view{ display:none; }
+.view.active{ display:block; animation:viewIn .4s var(--ease); }
+@keyframes viewIn{ from{ opacity:0; transform:translateY(10px); } to{ opacity:1; transform:none; } }
+.view-header{ display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:20px; flex-wrap:wrap; }
+.view-title{ font-size:24px; font-weight:800; display:flex; align-items:center; gap:10px; }
+.view-title .icon{ color:var(--primary); }
+.hero{ position:relative; border-radius:var(--radius-lg); overflow:hidden; background:linear-gradient(135deg, var(--primary-dim), var(--bg-2)); min-height:280px; margin-bottom:24px; display:flex; align-items:flex-end; padding:28px; isolation:isolate; }
+.hero::before{ content:''; position:absolute; inset:0; background:linear-gradient(180deg, transparent 40%, rgba(0,0,0,.85)); z-index:-1; }
+.hero::after{ content:''; position:absolute; inset:0; background:radial-gradient(circle at 20% 30%, var(--primary-glow), transparent 60%); z-index:-2; }
+.hero-content{ position:relative; z-index:1; color:#fff; max-width:640px; animation:fadeIn .6s var(--ease); }
+.hero-content h1{ font-size:32px; font-weight:800; margin-bottom:8px; }
+.hero-content p{ opacity:.85; margin-bottom:16px; font-size:14px; line-height:1.7; }
+.hero-tags{ display:flex; flex-wrap:wrap; gap:8px; margin-bottom:16px; }
+.hero-tag{ padding:4px 12px; background:rgba(255,255,255,.15); backdrop-filter:blur(8px); border-radius:20px; font-size:12px; font-weight:600; }
+.hero-actions{ display:flex; gap:10px; flex-wrap:wrap; }
+.section{ margin-bottom:32px; }
+.section-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
+.section-title{ font-size:18px; font-weight:700; display:flex; align-items:center; gap:8px; }
+.section-title .icon{ color:var(--primary); }
+.section-more{ font-size:13px; color:var(--primary); font-weight:600; display:flex; align-items:center; gap:4px; padding:6px 10px; border-radius:8px; transition:.2s var(--ease); }
+.section-more:hover{ background:var(--surface-2); transform:translateX(-2px); }
+.grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(160px, 1fr)); gap:16px; }
+.grid.wide{ grid-template-columns:repeat(auto-fill, minmax(200px, 1fr)); }
+.movie-card{ background:var(--surface); border-radius:var(--radius); overflow:hidden; cursor:pointer; transition:transform .3s var(--ease), box-shadow .3s, border-color .3s; border:1px solid var(--border); position:relative; display:flex; flex-direction:column; animation:cardIn .4s var(--ease) backwards; }
+@keyframes cardIn{ from{ opacity:0; transform:translateY(12px) scale(.97); } to{ opacity:1; transform:none; } }
+.movie-card:hover{ transform:translateY(-6px); box-shadow:var(--shadow); border-color:var(--primary); }
+.movie-card:hover .movie-overlay{ opacity:1; }
+.movie-poster{ aspect-ratio:2/3; background:var(--surface-2); overflow:hidden; position:relative; display:flex; align-items:center; justify-content:center; color:var(--text-muted); }
+.movie-poster img{ width:100%; height:100%; object-fit:cover; transition:transform .6s var(--ease); }
+.movie-card:hover .movie-poster img{ transform:scale(1.08); }
+.movie-overlay{ position:absolute; inset:0; background:linear-gradient(180deg, transparent 40%, rgba(0,0,0,.75)); display:flex; align-items:center; justify-content:center; opacity:0; transition:opacity .25s; }
+.movie-overlay-btn{ width:56px; height:56px; border-radius:50%; background:var(--gradient); color:#fff; display:flex; align-items:center; justify-content:center; box-shadow:var(--shadow-primary); border:none; cursor:pointer; transform:scale(.85); transition:transform .3s var(--ease); }
+.movie-card:hover .movie-overlay-btn{ transform:scale(1); }
+.movie-badge{ position:absolute; top:10px; right:10px; background:var(--gradient); color:#fff; padding:3px 10px; border-radius:20px; font-size:11px; font-weight:700; z-index:2; }
+.movie-badge.gold{ background:linear-gradient(135deg,#f59e0b,#b45309); }
+.movie-info{ padding:12px; display:flex; flex-direction:column; gap:4px; min-height:0; }
+.movie-title{ font-size:14px; font-weight:700; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; line-height:1.4; }
+.movie-meta{ display:flex; align-items:center; gap:8px; font-size:11px; color:var(--text-muted); }
+.movie-meta .rating{ color:var(--warning); font-weight:700; display:flex; align-items:center; gap:2px; }
+.row{ display:flex; gap:14px; overflow-x:auto; padding-bottom:8px; scroll-snap-type:x mandatory; scrollbar-width:thin; }
+.row .movie-card{ min-width:160px; max-width:160px; scroll-snap-align:start; }
+.chips{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:18px; overflow-x:auto; padding-bottom:4px; }
+.chip{ padding:8px 16px; border-radius:20px; background:var(--surface-2); border:1px solid var(--border); font-size:13px; font-weight:600; color:var(--text-dim); transition:.2s var(--ease); white-space:nowrap; }
+.chip:hover{ border-color:var(--primary); color:var(--text); }
+.chip:active{ transform:scale(.95); }
+.chip.active{ background:var(--gradient); color:#fff; border-color:transparent; }
+.people-grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(140px, 1fr)); gap:16px; }
+.person-card{ background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:16px; text-align:center; cursor:pointer; transition:.3s var(--ease); }
+.person-card:hover{ border-color:var(--primary); transform:translateY(-4px); box-shadow:var(--shadow); }
+.person-avatar{ width:80px; height:80px; border-radius:50%; margin:0 auto 12px; object-fit:cover; background:var(--surface-2); display:flex; align-items:center; justify-content:center; color:var(--text-muted); font-size:32px; font-weight:800; border:2px solid var(--border); }
+.person-name{ font-weight:700; font-size:14px; margin-bottom:4px; }
+.person-role{ font-size:11px; color:var(--text-muted); }
+.detail-modal{ position:fixed; inset:0; background:rgba(0,0,0,.92); backdrop-filter:blur(12px); z-index:500; display:none; align-items:center; justify-content:center; padding:20px; overflow-y:auto; }
+.detail-modal.active{ display:flex; }
+.detail-content{ background:var(--bg-2); border-radius:var(--radius-lg); border:1px solid var(--border); max-width:900px; width:100%; max-height:90vh; overflow-y:auto; position:relative; animation:modalIn .4s var(--ease); }
+@keyframes modalIn{ from{ transform:scale(.94); opacity:0; } to{ transform:none; opacity:1; } }
+.detail-banner{ aspect-ratio:16/7; background-size:cover; background-position:center; background-color:var(--surface-2); position:relative; }
+.detail-banner::after{ content:''; position:absolute; inset:0; background:linear-gradient(180deg, transparent 40%, var(--bg-2)); }
+.detail-close{ position:absolute; top:14px; left:14px; width:40px; height:40px; border-radius:50%; background:rgba(0,0,0,.7); color:#fff; display:flex; align-items:center; justify-content:center; z-index:2; }
+.detail-close:hover{ background:var(--primary); }
+.detail-body{ padding:0 28px 28px; margin-top:-80px; position:relative; z-index:1; }
+.detail-header{ display:flex; gap:20px; align-items:flex-end; flex-wrap:wrap; }
+.detail-poster{ width:150px; aspect-ratio:2/3; border-radius:var(--radius-sm); overflow:hidden; box-shadow:var(--shadow-lg); border:2px solid var(--bg-2); background:var(--surface-2); flex-shrink:0; }
+.detail-poster img{ width:100%; height:100%; object-fit:cover; }
+.detail-titles{ flex:1; min-width:220px; padding-bottom:8px; }
+.detail-titles h2{ font-size:26px; font-weight:800; margin-bottom:8px; line-height:1.3; }
+.detail-meta{ display:flex; flex-wrap:wrap; gap:12px; font-size:13px; color:var(--text-dim); margin-bottom:12px; }
+.detail-meta span{ display:flex; align-items:center; gap:4px; }
+.detail-desc{ color:var(--text-dim); line-height:1.8; font-size:14px; margin:20px 0; }
+.detail-info-grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(180px, 1fr)); gap:14px; margin:20px 0; padding:18px; background:var(--surface); border-radius:var(--radius-sm); border:1px solid var(--border); }
+.detail-info-item .label{ font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:.5px; margin-bottom:4px; }
+.detail-info-item .value{ font-size:14px; font-weight:600; }
+.player-modal{ position:fixed; inset:0; background:#000; z-index:1000; display:none; flex-direction:column; }
+.player-modal.active{ display:flex; }
+.player-stage{ flex:1; position:relative; display:flex; align-items:center; justify-content:center; background:#000; overflow:hidden; }
+.player-stage video{ width:100%; height:100%; max-height:100vh; object-fit:contain; background:#000; }
+.player-stage.force-landscape{ position:fixed !important; top:50% !important; left:50% !important; width:100vh !important; height:100vw !important; transform:translate(-50%,-50%) rotate(90deg) !important; transform-origin:center !important; z-index:1001; }
+.player-topbar{ position:absolute; top:0; left:0; right:0; padding:16px 20px; background:linear-gradient(180deg, rgba(0,0,0,.85), transparent); display:flex; align-items:center; gap:12px; color:#fff; z-index:2; opacity:0; transition:opacity .3s; }
+.player-stage.controls-visible .player-topbar{ opacity:1; }
+.player-title{ font-size:15px; font-weight:700; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; flex:1; }
+.player-close{ width:40px; height:40px; border-radius:50%; background:rgba(255,255,255,.15); color:#fff; display:flex; align-items:center; justify-content:center; transition:.2s; }
+.player-close:hover{ background:var(--primary); }
+.player-big-play{ position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:80px; height:80px; border-radius:50%; background:rgba(0,0,0,.6); backdrop-filter:blur(12px); color:#fff; display:flex; align-items:center; justify-content:center; cursor:pointer; border:2px solid rgba(255,255,255,.3); transition:.2s; z-index:3; }
+.player-big-play:hover{ background:var(--primary); transform:translate(-50%,-50%) scale(1.08); border-color:transparent; }
+.player-big-play.hidden{ display:none; }
+.player-controls{ position:absolute; bottom:0; left:0; right:0; padding:20px 20px 16px; background:linear-gradient(0deg, rgba(0,0,0,.9), transparent); color:#fff; z-index:2; opacity:0; transform:translateY(10px); transition:opacity .3s, transform .3s; }
+.player-stage.controls-visible .player-controls{ opacity:1; transform:translateY(0); }
+.progress-bar{ width:100%; height:6px; background:rgba(255,255,255,.2); border-radius:3px; cursor:pointer; position:relative; margin-bottom:12px; transition:height .15s; }
+.progress-bar:hover{ height:8px; }
+.progress-buffered{ position:absolute; top:0; left:0; height:100%; background:rgba(255,255,255,.35); border-radius:3px; pointer-events:none; }
+.progress-played{ position:absolute; top:0; left:0; height:100%; background:var(--primary); border-radius:3px; pointer-events:none; }
+.progress-knob{ position:absolute; top:50%; width:14px; height:14px; border-radius:50%; background:var(--primary); transform:translate(-50%,-50%) scale(0); transition:transform .15s; pointer-events:none; box-shadow:0 0 0 4px rgba(229,9,20,.3); }
+.progress-bar:hover .progress-knob{ transform:translate(-50%,-50%) scale(1); }
+.player-buttons{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+.player-btn{ width:40px; height:40px; border-radius:50%; background:transparent; color:#fff; display:flex; align-items:center; justify-content:center; transition:.2s; }
+.player-btn:hover{ background:rgba(255,255,255,.15); }
+.player-btn.primary{ background:rgba(255,255,255,.2); }
+.player-time{ font-size:13px; font-family:'Courier New',monospace; color:rgba(255,255,255,.9); margin-right:8px; white-space:nowrap; }
+.player-volume{ display:flex; align-items:center; gap:6px; margin-right:8px; }
+.player-volume-slider{ width:0; opacity:0; transition:width .2s,opacity .2s; -webkit-appearance:none; appearance:none; height:4px; background:rgba(255,255,255,.3); border-radius:2px; outline:none; }
+.player-volume:hover .player-volume-slider, .player-volume-slider:focus{ width:80px; opacity:1; }
+.player-volume-slider::-webkit-slider-thumb{ -webkit-appearance:none; appearance:none; width:12px; height:12px; border-radius:50%; background:var(--primary); cursor:pointer; }
+.player-spacer{ flex:1; }
+.skip-intro-btn{ position:absolute; bottom:120px; left:50%; transform:translateX(-50%); background:rgba(0,0,0,.8); color:#fff; padding:10px 22px; border-radius:30px; font-size:14px; font-weight:700; border:2px solid rgba(255,255,255,.4); display:none; z-index:4; transition:.2s; backdrop-filter:blur(8px); }
+.skip-intro-btn.show{ display:block; animation:fadeIn .3s; }
+.skip-intro-btn:hover{ background:var(--primary); border-color:transparent; }
+.player-settings-menu{ position:absolute; bottom:70px; left:20px; background:rgba(20,20,20,.95); backdrop-filter:blur(12px); border:1px solid rgba(255,255,255,.15); border-radius:12px; padding:8px; min-width:200px; display:none; z-index:5; }
+.player-settings-menu.open{ display:block; animation:fadeIn .2s; }
+.player-settings-menu button{ display:flex; align-items:center; justify-content:space-between; width:100%; padding:10px 14px; border-radius:8px; color:#fff; font-size:13px; text-align:right; }
+.player-settings-menu button:hover{ background:rgba(255,255,255,.1); }
+.player-settings-menu button.active{ background:var(--primary); }
+.player-settings-group{ padding:6px 14px; font-size:11px; color:rgba(255,255,255,.5); text-transform:uppercase; letter-spacing:.5px; }
+.composer{ background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:16px; margin-bottom:16px; }
+.composer textarea{ width:100%; min-height:80px; padding:12px; background:var(--surface-2); border:1px solid var(--border); border-radius:var(--radius-sm); resize:vertical; font-family:inherit; font-size:14px; color:var(--text); transition:.2s; }
+.composer textarea:focus{ border-color:var(--primary); outline:none; }
+.composer-actions{ display:flex; align-items:center; gap:8px; margin-top:10px; flex-wrap:wrap; }
+.composer-preview{ margin-top:10px; display:none; position:relative; max-width:220px; }
+.composer-preview img{ border-radius:8px; max-height:200px; object-fit:cover; }
+.composer-preview .remove{ position:absolute; top:-6px; right:-6px; width:26px; height:26px; border-radius:50%; background:var(--danger); color:#fff; display:flex; align-items:center; justify-content:center; font-size:14px; }
+.post{ background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:16px; margin-bottom:12px; animation:postIn .4s var(--ease) backwards; }
+@keyframes postIn{ from{ opacity:0; transform:translateY(12px); } to{ opacity:1; transform:none; } }
+.post:hover{ border-color:color-mix(in srgb, var(--border) 60%, var(--primary)); }
+.post-header{ display:flex; align-items:center; gap:12px; margin-bottom:12px; }
+.post-avatar{ width:44px; height:44px; border-radius:50%; object-fit:cover; background:var(--surface-2); border:1px solid var(--border); flex-shrink:0; display:flex; align-items:center; justify-content:center; font-weight:700; color:var(--text-dim); cursor:pointer; transition:transform .2s var(--ease), border-color .2s; }
+.post-avatar:hover{ transform:scale(1.08); border-color:var(--primary); }
+.post-info{ flex:1; min-width:0; }
+.post-name{ font-weight:700; font-size:14px; cursor:pointer; }
+.post-name:hover{ color:var(--primary); }
+.post-username{ font-size:12px; color:var(--text-muted); }
+.post-content{ line-height:1.7; font-size:14px; word-break:break-word; white-space:pre-wrap; margin-bottom:10px; }
+.post-image{ border-radius:var(--radius-sm); margin-top:10px; max-height:400px; width:auto; cursor:pointer; }
+.post-actions{ display:flex; gap:4px; border-top:1px solid var(--border-soft); padding-top:10px; margin-top:10px; flex-wrap:wrap; }
+.post-action{ display:inline-flex; align-items:center; gap:6px; padding:8px 12px; border-radius:8px; color:var(--text-dim); font-size:13px; font-weight:600; transition:.2s var(--ease); }
+.post-action:hover{ background:var(--surface-2); color:var(--text); }
+.post-action:active{ transform:scale(.95); }
+.post-action.liked{ color:var(--primary); }
+.post-action.liked .icon{ fill:var(--primary); }
+.post-comments{ margin-top:12px; padding-top:12px; border-top:1px solid var(--border-soft); display:none; }
+.post-comments.open{ display:block; animation:fadeIn .3s var(--ease); }
+.comment{ display:flex; gap:10px; margin-bottom:10px; }
+.comment-avatar{ width:34px; height:34px; border-radius:50%; background:var(--surface-2); flex-shrink:0; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:12px; color:var(--text-dim); object-fit:cover; cursor:pointer; transition:transform .2s var(--ease); }
+.comment-avatar:hover{ transform:scale(1.1); }
+.comment-body{ flex:1; background:var(--surface-2); border-radius:12px; padding:8px 12px; min-width:0; }
+.comment-name{ font-weight:700; font-size:13px; margin-bottom:2px; }
+.comment-text{ font-size:13px; line-height:1.5; word-break:break-word; }
+.comment-actions{ display:flex; gap:8px; margin-top:4px; font-size:11px; flex-wrap:wrap; align-items:center; }
+.comment-actions button{ color:var(--text-muted); display:inline-flex; align-items:center; gap:3px; padding:2px 4px; border-radius:4px; transition:.2s; }
+.comment-actions button:hover{ color:var(--primary); background:var(--surface-3); }
+.comment-actions button.liked{ color:var(--primary); }
+.comment-actions button.liked .icon{ fill:var(--primary); }
+.comment-input{ display:flex; gap:8px; align-items:center; }
+.comment-input input{ flex:1; padding:10px 14px; border-radius:20px; background:var(--surface-2); border:1px solid var(--border); color:var(--text); font-size:13px; }
+.comment-input input:focus{ border-color:var(--primary); outline:none; }
+.comment-replies{ margin-right:44px; margin-top:6px; border-right:2px solid var(--border-soft); padding-right:8px; }
+.reply-input-box { margin-right:44px; margin-top:6px; display:none; }
+.reply-input-box.open { display:flex; gap:6px; }
+.reply-input-box input { flex:1; padding:8px 12px; border-radius:18px; background:var(--surface-3); border:1px solid var(--border); color:var(--text); font-size:12px; }
+.settings-grid{ display:flex; flex-direction:column; gap:12px; max-width:720px; }
+.setting-item{ background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:18px; display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; }
+.setting-item .setting-info{ flex:1; min-width:200px; }
+.setting-item .setting-info strong{ display:block; font-size:14px; margin-bottom:3px; }
+.setting-item .setting-info span{ font-size:12px; color:var(--text-muted); }
+.setting-item.vertical{ flex-direction:column; align-items:stretch; }
+.setting-item .field{ margin:0; }
+.setting-row{ display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
+.setting-row .field{ flex:1; min-width:120px; }
+.toggle{ width:48px; height:26px; border-radius:13px; background:var(--surface-3); position:relative; cursor:pointer; transition:.25s; flex-shrink:0; border:1px solid var(--border); }
+.toggle::after{ content:''; position:absolute; top:2px; right:2px; width:20px; height:20px; border-radius:50%; background:#fff; transition:.25s var(--ease); box-shadow:0 2px 4px rgba(0,0,0,.3); }
+.toggle.on{ background:var(--gradient); border-color:transparent; }
+.toggle.on::after{ right:calc(100% - 22px); }
+
+/* ===== Profile Banner ===== */
+.profile-banner-wrap{
+  position:relative;
+  width:100%;
+  margin-bottom:-50px;
+  animation:fadeIn .5s var(--ease);
+}
+.profile-banner{
+  width:100%;
+  height:220px;
+  border-radius:var(--radius);
+  background:linear-gradient(135deg, var(--primary-dim), var(--bg-3));
+  background-size:cover;
+  background-position:center;
+  border:1px solid var(--border);
+  position:relative;
+  overflow:hidden;
+}
+.profile-banner::after{
+  content:'';
+  position:absolute; inset:0;
+  background:linear-gradient(180deg, transparent 50%, rgba(0,0,0,.4));
+  pointer-events:none;
+}
+.profile-banner-edit{
+  position:absolute;
+  bottom:16px;
+  left:16px;
+  width:42px; height:42px;
+  border-radius:50%;
+  background:rgba(0,0,0,.7);
+  color:#fff;
+  display:flex; align-items:center; justify-content:center;
+  border:2px solid rgba(255,255,255,.3);
+  cursor:pointer;
+  z-index:2;
+  transition:transform .2s var(--ease), background .2s;
+}
+.profile-banner-edit:hover{ background:var(--primary); transform:scale(1.08); }
+
+.profile-header{ display:flex; gap:20px; align-items:center; flex-wrap:wrap; margin-bottom:24px; padding:20px; background:var(--surface); border-radius:var(--radius); border:1px solid var(--border); position:relative; animation:fadeIn .5s var(--ease); }
+.profile-pic-wrap{ position:relative; }
+.profile-pic{ width:100px; height:100px; border-radius:50%; object-fit:cover; border:3px solid var(--primary); background:var(--surface-2); display:flex; align-items:center; justify-content:center; font-weight:800; font-size:32px; color:var(--text-dim); background-size:cover; background-position:center; transition:transform .25s var(--ease); }
+.profile-pic:hover{ transform:scale(1.04); }
+.profile-pic-edit{ position:absolute; bottom:0; right:0; width:32px; height:32px; border-radius:50%; background:var(--gradient); color:#fff; display:flex; align-items:center; justify-content:center; border:2px solid var(--surface); cursor:pointer; }
+.profile-meta{ flex:1; min-width:200px; }
+.profile-meta h3{ font-size:20px; font-weight:800; margin-bottom:4px; }
+.profile-meta p{ font-size:13px; color:var(--text-dim); }
+.profile-actions{ display:flex; gap:8px; flex-wrap:wrap; margin-right:auto; }
+
+.empty{ text-align:center; padding:60px 20px; color:var(--text-muted); }
+.empty .icon{ width:48px; height:48px; margin-bottom:12px; opacity:.4; }
+.empty h3{ font-size:16px; font-weight:600; margin-bottom:6px; color:var(--text-dim); }
+.empty p{ font-size:13px; }
+.loader{ display:flex; flex-direction:column; align-items:center; justify-content:center; padding:60px 20px; gap:16px; }
+.spinner{ width:44px; height:44px; border:3px solid var(--border); border-top-color:var(--primary); border-radius:50%; animation:spin .8s linear infinite; }
+@keyframes spin{ to{ transform:rotate(360deg); } }
+.loader p{ color:var(--text-dim); font-size:14px; }
+.modal{ position:fixed; inset:0; background:rgba(0,0,0,.85); backdrop-filter:blur(10px); z-index:600; display:none; align-items:center; justify-content:center; padding:20px; overflow-y:auto; }
+.modal.active{ display:flex; }
+.modal-panel{ background:var(--bg-2); border:1px solid var(--border); border-radius:var(--radius-lg); padding:26px; width:min(480px, 100%); max-height:90vh; overflow-y:auto; position:relative; animation:modalIn .35s var(--ease); }
+.modal-panel h3{ font-size:20px; font-weight:800; margin-bottom:8px; display:flex; align-items:center; gap:10px; }
+.modal-panel h3 .icon{ color:var(--primary); }
+.modal-panel .modal-sub{ color:var(--text-muted); font-size:13px; margin-bottom:20px; line-height:1.6; }
+.modal-panel .field{ margin-bottom:12px; }
+.modal-close{ position:absolute; top:14px; left:14px; width:34px; height:34px; border-radius:50%; background:var(--surface-2); display:flex; align-items:center; justify-content:center; transition:.2s var(--ease); }
+.modal-close:hover{ background:var(--danger); color:#fff; transform:rotate(90deg); }
+.email-code-box{ background:linear-gradient(135deg, var(--surface-2), var(--surface)); border:2px dashed var(--primary); border-radius:var(--radius-sm); padding:20px; text-align:center; margin:16px 0; }
+.email-code-box .label{ font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:8px; display:flex; align-items:center; justify-content:center; gap:6px; }
+.email-code{ font-family:'Courier New',monospace; font-size:32px; font-weight:800; letter-spacing:8px; color:var(--primary); direction:ltr; }
+.mobile-nav{ display:none; position:fixed; bottom:0; left:0; right:0; background:var(--bg-2); border-top:1px solid var(--border); padding:8px 0 max(8px, env(safe-area-inset-bottom)); z-index:100; backdrop-filter:blur(20px); }
+.mobile-nav-inner{ display:flex; justify-content:space-around; align-items:center; }
+.mobile-nav button{ flex:1; display:flex; flex-direction:column; align-items:center; gap:3px; padding:6px; font-size:10px; font-weight:600; color:var(--text-muted); transition:.2s var(--ease); position:relative; }
+.mobile-nav button .icon{ width:22px; height:22px; }
+.mobile-nav button.active{ color:var(--primary); transform:translateY(-2px); }
+
+@media (max-width: 1024px){ .sidebar{ width:200px; } }
+@media (max-width: 820px){
+  .sidebar{ display:none; }
+  .topbar-brand{ display:flex; }
+  .mobile-nav{ display:block; }
+  .content{ padding:14px; padding-bottom:90px; }
+  .grid{ grid-template-columns:repeat(auto-fill, minmax(130px, 1fr)); gap:12px; }
+  .grid.wide{ grid-template-columns:repeat(auto-fill, minmax(160px, 1fr)); }
+  .hero{ min-height:220px; padding:20px; }
+  .hero-content h1{ font-size:22px; }
+  .hero-content p{ font-size:13px; }
+  .view-title{ font-size:20px; }
+  .detail-body{ padding:0 18px 18px; }
+  .detail-titles h2{ font-size:20px; }
+  .detail-poster{ width:110px; }
+  .player-volume-slider{ display:none; }
+  .row .movie-card{ min-width:130px; max-width:130px; }
+  .comment-replies{ margin-right:24px; }
+  .reply-input-box{ margin-right:24px; }
+  .profile-banner{ height:160px; }
+}
+@media (max-width: 500px){
+  .grid{ grid-template-columns:repeat(2, 1fr); }
+  .grid.wide{ grid-template-columns:repeat(2, 1fr); }
+  .movie-title{ font-size:12px; }
+  .topbar-search{ max-width:none; }
+  .auth-card{ padding:26px 20px; }
+  .auth-title{ font-size:22px; }
+  .detail-modal{ padding:0; }
+  .detail-content{ max-height:100vh; border-radius:0; }
+  .player-title{ font-size:13px; }
+  .email-code{ font-size:26px; letter-spacing:5px; }
+  .modal-panel{ padding:20px; }
+  .profile-pic{ width:80px; height:80px; }
+  .setting-item{ padding:14px; }
+  .profile-banner{ height:130px; }
+  .profile-banner-edit{ width:36px; height:36px; bottom:10px; left:10px; }
+}
+@media (min-width: 1600px){
+  .content{ max-width:1600px; margin:0 auto; width:100%; }
+}
+</style>
+</head>
+<body>
+
+<svg class="svg-sprite" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <defs>
+    <linearGradient id="logoGradient" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#e50914"/>
+      <stop offset="1" stop-color="#9b0610"/>
+    </linearGradient>
+  </defs>
+  <symbol id="i-logo" viewBox="0 0 64 64">
+    <rect width="64" height="64" rx="14" fill="url(#logoGradient)"/>
+    <path d="M24 20 L44 32 L24 44 Z" fill="#fff"/>
+  </symbol>
+  <symbol id="i-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></symbol>
+  <symbol id="i-pause" viewBox="0 0 24 24"><path d="M6 4h4v16H6zm8 0h4v16h-4z"/></symbol>
+  <symbol id="i-vol-high" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.47 4.47 0 0 0 16.5 12zm0-7.5v2.06a7 7 0 0 1 0 10.88v2.06a9 9 0 0 0 0-15z"/></symbol>
+  <symbol id="i-vol-low" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.47 4.47 0 0 0 16.5 12z"/></symbol>
+  <symbol id="i-vol-mute" viewBox="0 0 24 24"><path d="M16.5 12A4.5 4.5 0 0 0 14 7.97v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51A8.79 8.79 0 0 0 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06a8.99 8.99 0 0 0 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/></symbol>
+  <symbol id="i-fullscreen" viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></symbol>
+  <symbol id="i-skip-fwd" viewBox="0 0 24 24"><path d="M4 18l8.5-6L4 6v12zm9-12v12l8.5-6L13 6z"/></symbol>
+  <symbol id="i-skip-back" viewBox="0 0 24 24"><path d="M11 18V6l-8.5 6L11 18zm.5-6L20 18V6l-8.5 6z"/></symbol>
+  <symbol id="i-settings" viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.49.49 0 0 0-.59-.22l-2.39.96a7.01 7.01 0 0 0-1.62-.94l-.36-2.54a.48.48 0 0 0-.48-.41h-3.84a.48.48 0 0 0-.48.41l-.36 2.54c-.59.24-1.13.56-1.62.94l-2.39-.96a.49.49 0 0 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.48-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6a3.6 3.6 0 1 1 0-7.2 3.6 3.6 0 0 1 0 7.2z"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></symbol>
+  <symbol id="i-users" viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></symbol>
+  <symbol id="i-mail" viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></symbol>
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></symbol>
+  <symbol id="i-film" viewBox="0 0 24 24"><path d="M18 4l2 4h-3l-2-4h-2l2 4h-3l-2-4H8l2 4H7L5 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4h-4z"/></symbol>
+  <symbol id="i-star" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></symbol>
+  <symbol id="i-heart" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></symbol>
+  <symbol id="i-close" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></symbol>
+  <symbol id="i-chev-left" viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></symbol>
+  <symbol id="i-chev-right" viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6z"/></symbol>
+  <symbol id="i-trash" viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></symbol>
+  <symbol id="i-send" viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></symbol>
+  <symbol id="i-upload" viewBox="0 0 24 24"><path d="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z"/></symbol>
+  <symbol id="i-image" viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></symbol>
+  <symbol id="i-camera" viewBox="0 0 24 24"><path d="M9 2L7.17 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2h-3.17L15 2H9zm3 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"/></symbol>
+  <symbol id="i-moon" viewBox="0 0 24 24"><path d="M12.3 22c-5.5 0-10-4.5-10-10 0-4.8 3.5-8.9 8.2-9.8.4-.1.8.2.9.5.1.4-.1.8-.4 1-1.1.9-1.7 2.2-1.7 3.6 0 2.6 2.1 4.7 4.7 4.7 1.4 0 2.7-.6 3.6-1.7.3-.3.7-.4 1-.3.4.1.6.5.5.9-.9 4.7-5 8.1-9.8 8.1z"/></symbol>
+  <symbol id="i-logout" viewBox="0 0 24 24"><path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/></symbol>
+  <symbol id="i-info" viewBox="0 0 24 24"><path d="M11 17h2v-6h-2v6zm1-15C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zM11 9h2V7h-2v2z"/></symbol>
+  <symbol id="i-help" viewBox="0 0 24 24"><path d="M11 18h2v-2h-2v2zm1-16C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-2.21 0-4 1.79-4 4h2c0-1.1.9-2 2-2s2 .9 2 2c0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5 0-2.21-1.79-4-4-4z"/></symbol>
+  <symbol id="i-comment" viewBox="0 0 24 24"><path d="M21.99 4c0-1.1-.89-2-1.99-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14l4 4-.01-18zM18 14H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/></symbol>
+  <symbol id="i-bookmark" viewBox="0 0 24 24"><path d="M17 3H7c-1.1 0-1.99.9-1.99 2L5 21l7-3 7 3V5c0-1.1-.9-2-2-2z"/></symbol>
+  <symbol id="i-share" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92-1.31-2.92-2.92-2.92z"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></symbol>
+  <symbol id="i-calendar" viewBox="0 0 24 24"><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/></symbol>
+  <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M17.65 6.35A7.958 7.958 0 0 0 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0 1 12 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></symbol>
+  <symbol id="i-key" viewBox="0 0 24 24"><path d="M12.65 10A5.99 5.99 0 0 0 7 6c-3.31 0-6 2.69-6 6s2.69 6 6 6a5.99 5.99 0 0 0 5.65-4H17v4h4v-4h2v-4H12.65zM7 14c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></symbol>
+  <symbol id="i-sparkles" viewBox="0 0 24 24"><path d="M19 9l1.25-2.75L23 5l-2.75-1.25L19 1l-1.25 2.75L15 5l2.75 1.25L19 9zm-7.5.5L9 4 6.5 9.5 1 12l5.5 2.5L9 20l2.5-5.5L17 12l-5.5-2.5zM19 15l-1.25 2.75L15 19l2.75 1.25L19 23l1.25-2.75L23 19l-2.75-1.25L19 15z"/></symbol>
+  <symbol id="i-download" viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></symbol>
+  <symbol id="i-user-plus" viewBox="0 0 24 24"><path d="M15 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm-9-2V7H4v3H1v2h3v3h2v-3h3v-2H6zm9 4c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></symbol>
+  <symbol id="i-user-check" viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></symbol>
+  <symbol id="i-reply" viewBox="0 0 24 24"><path d="M10 9V5l-7 7 7 7v-4.1c5 0 8.5 1.6 11 5.1-1-5-4-10-11-11z"/></symbol>
+  <symbol id="i-arrow-right" viewBox="0 0 24 24"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/></symbol>
+</svg>
+
+<div id="toastContainer"></div>
+
+<div id="splashScreen">
+  <svg class="splash-logo"><use href="#i-logo"/></svg>
+  <div class="splash-title">FoxKio Movies</div>
+  <div class="spinner"></div>
+</div>
+
+<div id="authScreen" class="screen">
+  <div class="auth-card">
+    <svg class="auth-logo"><use href="#i-logo"/></svg>
+    <h1 class="auth-title">FoxKio Movies</h1>
+    <p class="auth-sub">منصة الأفلام والأنمي الآمنة</p>
+    <div class="tabs">
+      <button id="tabLogin" class="active" type="button">تسجيل الدخول</button>
+      <button id="tabRegister" type="button">حساب جديد</button>
+    </div>
+    <form id="formLogin" class="auth-form active" novalidate>
+      <input id="loginEmail" class="field" type="text" placeholder="البريد الإلكتروني أو اسم المستخدم" autocomplete="username">
+      <input id="loginPassword" class="field" type="password" placeholder="كلمة المرور" autocomplete="current-password">
+      <p id="loginError" class="err"></p>
+      <div class="auth-actions">
+        <span></span>
+        <button type="button" class="link-btn" id="forgotPasswordBtn" style="width:auto;">نسيت كلمة المرور؟</button>
+      </div>
+      <button type="submit" class="btn primary block"><svg class="icon"><use href="#i-lock"/></svg> دخول</button>
+    </form>
+    <form id="formRegister" class="auth-form" novalidate>
+      <input id="regUsername" class="field" type="text" placeholder="اسم المستخدم" autocomplete="username">
+      <input id="regEmail" class="field" type="email" placeholder="البريد الإلكتروني" autocomplete="email">
+      <input id="regPassword" class="field" type="password" placeholder="كلمة المرور" autocomplete="new-password">
+      <input id="regPasswordConfirm" class="field" type="password" placeholder="تأكيد كلمة المرور" autocomplete="new-password">
+      <p id="registerError" class="err"></p>
+      <button type="submit" class="btn primary block"><svg class="icon"><use href="#i-user"/></svg> إنشاء حساب</button>
+    </form>
+  </div>
+</div>
+
+<div id="appScreen" class="screen">
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <svg width="36" height="36"><use href="#i-logo"/></svg>
+        <span>FoxKio Movies</span>
+      </div>
+      <button class="nav-btn active" data-view="home"><svg class="icon icon-lg"><use href="#i-home"/></svg> الرئيسية</button>
+      <button class="nav-btn" data-view="movies"><svg class="icon icon-lg"><use href="#i-film"/></svg> الأفلام</button>
+      <button class="nav-btn" data-view="anime"><svg class="icon icon-lg"><use href="#i-sparkles"/></svg> الأنمي</button>
+      <button class="nav-btn" data-view="people"><svg class="icon icon-lg"><use href="#i-users"/></svg> الفنانين</button>
+      <button class="nav-btn" data-view="social"><svg class="icon icon-lg"><use href="#i-comment"/></svg> المجتمع</button>
+      <button class="nav-btn" data-view="watchlist"><svg class="icon icon-lg"><use href="#i-bookmark"/></svg> قائمتي</button>
+      <div class="sidebar-divider"></div>
+      <button class="nav-btn" data-view="profile"><svg class="icon icon-lg"><use href="#i-user"/></svg> ملفي</button>
+      <button class="nav-btn" data-view="settings"><svg class="icon icon-lg"><use href="#i-settings"/></svg> الإعدادات</button>
+      <button class="nav-btn" data-view="support"><svg class="icon icon-lg"><use href="#i-help"/></svg> الدعم</button>
+      <div class="sidebar-spacer"></div>
+      <button class="nav-btn" id="themeToggle"><svg class="icon icon-lg"><use href="#i-moon"/></svg> <span id="themeToggleLabel">الوضع الفاتح</span></button>
+      <button class="nav-btn" id="logoutBtn" style="color:var(--danger)"><svg class="icon icon-lg"><use href="#i-logout"/></svg> خروج</button>
+    </aside>
+
+    <div class="main">
+      <header class="topbar">
+        <div class="topbar-brand">
+          <svg width="28" height="28"><use href="#i-logo"/></svg>
+          <span>FoxKio</span>
+        </div>
+        <div class="topbar-search">
+          <svg class="icon"><use href="#i-search"/></svg>
+          <input id="searchInput" class="field" type="search" placeholder="ابحث عن فيلم، ممثل، تصنيف...">
+        </div>
+        <div class="topbar-actions">
+          <div class="connection-status" id="connectionStatus">
+            <span class="dot"></span>
+            <span>غير متصل</span>
+          </div>
+          <img id="topbarAvatar" class="avatar-sm" alt="" title="ملفي الشخصي">
+        </div>
+      </header>
+
+      <main class="content" id="mainContent">
+        <div class="view active" id="view-home">
+          <div id="heroContainer"></div>
+          <div id="homeSections"></div>
+        </div>
+
+        <div class="view" id="view-movies">
+          <div class="view-header">
+            <h2 class="view-title"><svg class="icon"><use href="#i-film"/></svg> الأفلام</h2>
+          </div>
+          <div class="chips" id="movieChips"></div>
+          <div class="grid" id="movieGrid"></div>
+        </div>
+
+        <div class="view" id="view-anime">
+          <div class="view-header">
+            <h2 class="view-title"><svg class="icon"><use href="#i-sparkles"/></svg> الأنمي</h2>
+          </div>
+          <div class="chips" id="animeChips"></div>
+          <div class="grid" id="animeGrid"></div>
+        </div>
+
+        <div class="view" id="view-people">
+          <div class="view-header">
+            <h2 class="view-title"><svg class="icon"><use href="#i-users"/></svg> الفنانين</h2>
+          </div>
+          <div class="tabs" style="max-width:520px;">
+            <button data-people-type="actors" class="active" type="button">الممثلون</button>
+            <button data-people-type="studios" type="button">الاستوديوهات</button>
+            <button data-people-type="authors" type="button">المؤلفون</button>
+          </div>
+          <div class="people-grid" id="peopleGrid"></div>
+        </div>
+
+        <div class="view" id="view-social">
+          <div class="view-header">
+            <h2 class="view-title"><svg class="icon"><use href="#i-comment"/></svg> المجتمع</h2>
+          </div>
+          <div class="composer">
+            <textarea id="postContent" placeholder="شاركنا رأيك في فيلم... استخدم #هاشتاق و @للإشارة" maxlength="500"></textarea>
+            <div class="composer-preview" id="postImagePreview"></div>
+            <div class="composer-actions">
+              <button class="btn ghost sm" id="postImageBtn" type="button"><svg class="icon icon-sm"><use href="#i-image"/></svg> صورة</button>
+              <input type="file" id="postImageInput" accept="image/*" style="display:none">
+              <div style="flex:1"></div>
+              <button class="btn primary sm" id="postSubmitBtn" type="button"><svg class="icon icon-sm"><use href="#i-send"/></svg> نشر</button>
+            </div>
+          </div>
+          <div id="socialFeed"></div>
+        </div>
+
+        <div class="view" id="view-watchlist">
+          <div class="view-header">
+            <h2 class="view-title"><svg class="icon"><use href="#i-bookmark"/></svg> قائمتي</h2>
+          </div>
+          <div id="watchlistContent"></div>
+        </div>
+
+        <div class="view" id="view-profile">
+          <div class="view-header">
+            <h2 class="view-title"><svg class="icon"><use href="#i-user"/></svg> ملفي</h2>
+            <button class="btn ghost sm" id="profileLogoutBtn" type="button" style="color:var(--danger);"><svg class="icon icon-sm"><use href="#i-logout"/></svg> خروج</button>
+          </div>
+          <div class="profile-banner-wrap">
+            <div class="profile-banner" id="profileBanner"></div>
+            <button class="profile-banner-edit" id="profileBannerBtn" type="button" title="تغيير البانر">
+              <svg class="icon icon-sm"><use href="#i-camera"/></svg>
+            </button>
+            <input type="file" id="profileBannerInput" accept="image/*" style="display:none">
+          </div>
+          <div class="profile-header">
+            <div class="profile-pic-wrap">
+              <div class="profile-pic" id="profileAvatar"></div>
+              <button class="profile-pic-edit" id="profileAvatarBtn" title="تغيير الصورة" type="button">
+                <svg class="icon icon-sm"><use href="#i-camera"/></svg>
+              </button>
+              <input type="file" id="profileAvatarInput" accept="image/*" style="display:none">
+            </div>
+            <div class="profile-meta">
+              <h3 id="profileDisplayName">-</h3>
+              <p id="profileEmail">-</p>
+              <p id="profileJoined" class="tiny">-</p>
+              <p id="profileStats" class="tiny" style="margin-top:6px;">-</p>
+            </div>
+          </div>
+          <div class="card" style="max-width:600px;margin-bottom:20px;">
+            <label style="display:block;font-weight:700;margin-bottom:8px;">نبذة عني</label>
+            <textarea id="profileBio" class="field" maxlength="200" placeholder="اكتب نبذة قصيرة..."></textarea>
+            <button class="btn primary sm" id="saveBioBtn" type="button" style="margin-top:12px;">
+              <svg class="icon icon-sm"><use href="#i-check"/></svg> حفظ
+            </button>
+          </div>
+          <h3 style="font-weight:800;margin-bottom:12px;display:flex;align-items:center;gap:8px;"><svg class="icon"><use href="#i-comment"/></svg> منشوراتي</h3>
+          <div id="myPostsFeed"></div>
+        </div>
+
+        <div class="view" id="view-userprofile">
+          <div class="view-header">
+            <button class="icon-btn" id="backFromUserProfile" type="button" title="رجوع">
+              <svg class="icon"><use href="#i-arrow-right"/></svg>
+            </button>
+            <h2 class="view-title"><svg class="icon"><use href="#i-user"/></svg> الملف الشخصي</h2>
+          </div>
+          <div id="userProfileContent"></div>
+        </div>
+
+        <div class="view" id="view-settings">
+          <div class="view-header">
+            <h2 class="view-title"><svg class="icon"><use href="#i-settings"/></svg> الإعدادات</h2>
+          </div>
+          <div class="settings-grid">
+            <div class="setting-item">
+              <div class="setting-info"><strong>الوضع الليلي</strong><span>تبديل بين الفاتح والداكن</span></div>
+              <div class="toggle" id="stTheme"></div>
+            </div>
+            <div class="setting-item">
+              <div class="setting-info"><strong>الخط</strong><span>اختر الخط المفضل</span></div>
+              <select id="stFont" class="field" style="max-width:240px;">
+                <option value="cairo">Cairo</option>
+                <option value="tajawal">Tajawal</option>
+                <option value="amiri">Amiri</option>
+                <option value="readex">Readex Pro</option>
+                <option value="plex">IBM Plex Sans Arabic</option>
+                <option value="almarai">Almarai</option>
+                <option value="system">System</option>
+              </select>
+            </div>
+            <div class="setting-item vertical">
+              <div class="setting-info"><strong>مدة التخطي</strong><span id="stSkipValue">10 ثوانٍ</span></div>
+              <input type="range" id="stSkipRange" min="5" max="30" step="5" value="10" style="width:100%; accent-color:var(--primary);">
+            </div>
+            <div class="setting-item vertical">
+              <div class="setting-info"><strong>تغيير اسم المستخدم</strong><span id="stUsernameStatus">-</span></div>
+              <div class="setting-row">
+                <input id="stNewUsername" class="field" placeholder="اسم المستخدم الجديد">
+                <button class="btn primary sm" id="stChangeUsernameBtn" type="button">تغيير</button>
+              </div>
+            </div>
+            <div class="setting-item">
+              <div class="setting-info"><strong>كلمة المرور</strong><span>تغيير كلمة المرور</span></div>
+              <button class="btn ghost sm" id="stChangePasswordBtn" type="button"><svg class="icon icon-sm"><use href="#i-key"/></svg> تغيير</button>
+            </div>
+            <div class="setting-item">
+              <div class="setting-info"><strong>الصورة الشخصية</strong><span>تغيير صورتك</span></div>
+              <button class="btn ghost sm" id="stChangeAvatarBtn" type="button"><svg class="icon icon-sm"><use href="#i-upload"/></svg> رفع</button>
+            </div>
+            <div class="setting-item">
+              <div class="setting-info"><strong>تسجيل الخروج</strong><span>إنهاء الجلسة الحالية</span></div>
+              <button class="btn danger sm" id="stLogoutBtn" type="button"><svg class="icon icon-sm"><use href="#i-logout"/></svg> خروج</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="view" id="view-support">
+          <div class="view-header">
+            <h2 class="view-title"><svg class="icon"><use href="#i-help"/></svg> الدعم</h2>
+          </div>
+          <div class="card" style="max-width:600px;">
+            <p class="muted" style="margin-bottom:14px;">للتواصل: <strong style="color:var(--primary);">foxkio.team@gmail.com</strong></p>
+            <input id="supportSubject" class="field" placeholder="الموضوع" maxlength="100">
+            <textarea id="supportBody" class="field" placeholder="اشرح مشكلتك..." maxlength="2000"></textarea>
+            <p id="supportResult" class="err"></p>
+            <button class="btn primary block" id="sendSupportBtn" type="button"><svg class="icon"><use href="#i-send"/></svg> إرسال</button>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <nav class="mobile-nav">
+    <div class="mobile-nav-inner">
+      <button data-view="home" class="active"><svg class="icon"><use href="#i-home"/></svg><span>الرئيسية</span></button>
+      <button data-view="movies"><svg class="icon"><use href="#i-film"/></svg><span>أفلام</span></button>
+      <button data-view="anime"><svg class="icon"><use href="#i-sparkles"/></svg><span>أنمي</span></button>
+      <button data-view="social"><svg class="icon"><use href="#i-comment"/></svg><span>المجتمع</span></button>
+      <button data-view="profile"><svg class="icon"><use href="#i-user"/></svg><span>ملفي</span></button>
+    </div>
+  </nav>
+</div>
+
+<div id="detailModal" class="detail-modal"></div>
+
+<div id="playerModal" class="player-modal">
+  <div class="player-stage" id="playerStage">
+    <video id="playerVideo" playsinline preload="metadata"></video>
+    <div class="player-topbar">
+      <div class="player-title" id="playerTitle">-</div>
+      <button class="player-close" id="playerCloseBtn" title="إغلاق" type="button"><svg class="icon"><use href="#i-close"/></svg></button>
+    </div>
+    <button class="player-big-play" id="playerBigPlay" type="button"><svg class="icon icon-xl"><use href="#i-play"/></svg></button>
+    <button class="skip-intro-btn" id="skipIntroBtn" type="button">تخطي المقدمة ←</button>
+    <div class="player-controls" id="playerControls">
+      <div class="progress-bar" id="progressBar">
+        <div class="progress-buffered" id="progressBuffered"></div>
+        <div class="progress-played" id="progressPlayed"></div>
+        <div class="progress-knob" id="progressKnob"></div>
+      </div>
+      <div class="player-buttons">
+        <button class="player-btn primary" id="playPauseBtn" type="button"><svg class="icon"><use href="#i-play"/></svg></button>
+        <button class="player-btn" id="skipBackBtn" type="button"><svg class="icon"><use href="#i-skip-back"/></svg></button>
+        <button class="player-btn" id="skipFwdBtn" type="button"><svg class="icon"><use href="#i-skip-fwd"/></svg></button>
+        <div class="player-volume">
+          <button class="player-btn" id="volumeBtn" type="button"><svg class="icon"><use href="#i-vol-high"/></svg></button>
+          <input type="range" class="player-volume-slider" id="volumeSlider" min="0" max="1" step="0.05" value="1">
+        </div>
+        <span class="player-time" id="playerTime">0:00 / 0:00</span>
+        <div class="player-spacer"></div>
+        <button class="player-btn" id="settingsBtn" type="button"><svg class="icon"><use href="#i-settings"/></svg></button>
+        <button class="player-btn" id="rotateBtn" type="button" title="تدوير"><svg class="icon"><use href="#i-refresh"/></svg></button>
+        <button class="player-btn" id="fullscreenBtn" type="button"><svg class="icon"><use href="#i-fullscreen"/></svg></button>
+      </div>
+    </div>
+    <div class="player-settings-menu" id="playerSettingsMenu">
+      <div class="player-settings-group">سرعة التشغيل</div>
+      <button data-speed="0.5" type="button">0.5x</button>
+      <button data-speed="0.75" type="button">0.75x</button>
+      <button data-speed="1" class="active" type="button">1x (عادي)</button>
+      <button data-speed="1.25" type="button">1.25x</button>
+      <button data-speed="1.5" type="button">1.5x</button>
+      <button data-speed="2" type="button">2x</button>
+    </div>
+  </div>
+</div>
+
+<div id="genericModal" class="modal"></div>
+
+<script>
+'use strict';
+
+history.scrollRestoration = 'manual';
+
+/* ══════════════════════════════════════════════════════════
+   SecureConfig + Supabase init (unchanged)
+   ══════════════════════════════════════════════════════════ */
+const SecureConfig = {
+  _u: ['__SB_URL_B64__'],
+  _k: ['__SB_KEY_B64__'],
+  decode() {
+    try {
+      const url = atob(this._u.join(''));
+      const key = atob(this._k.join(''));
+      if (!/^https?:\/\//.test(url) || !key) return null;
+      return { url, key };
+    } catch (e) { return null; }
+  }
+};
+
+let SUPABASE_URL = '';
+let SUPABASE_ANON_KEY = '';
+(function resolveConfigSync() {
+  const cfg = SecureConfig.decode();
+  if (cfg) { SUPABASE_URL = cfg.url; SUPABASE_ANON_KEY = cfg.key; }
+})();
+
+let supabaseClient = null;
+if (typeof supabase !== 'undefined' && SUPABASE_URL && SUPABASE_ANON_KEY) {
+  try {
+    supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true, storageKey: 'foxkio_auth' }
+    });
+  } catch (e) { console.warn('Supabase init failed:', e); }
+}
+const USE_SUPABASE = !!supabaseClient;
+
+const $ = (sel, root = document) => root.querySelector(sel);
+const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
+
+function escapeHtml(value) {
+  return String(value ?? '').replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
+}
+function escapeAttr(value) {
+  return String(value ?? '').replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
+}
+function sanitizeText(value, maxLen = 5000) {
+  return String(value ?? '').replace(/<[^>]*>/g, '').replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, '').slice(0, maxLen).trim();
+}
+function safeImgUrl(url) {
+  if (!url || typeof url !== 'string') return '';
+  const t = url.trim();
+  if (/^data:image\/(png|jpe?g|gif|webp|svg\+xml);base64,[A-Za-z0-9+/=]+$/i.test(t)) return t;
+  if (/^https?:\/\//i.test(t)) return escapeAttr(t);
+  if (t.startsWith('//')) return escapeAttr('https:' + t);
+  return '';
+}
+function safeUrl(url) {
+  if (!url || typeof url !== 'string') return '';
+  const trimmed = url.trim();
+  if (/^(javascript|data|vbscript|file|blob):/i.test(trimmed)) return '';
+  if (/^https?:\/\//i.test(trimmed)) return trimmed;
+  if (/^\/\//.test(trimmed)) return 'https:' + trimmed;
+  return '';
+}
+function uid(prefix = 'id') {
+  if (crypto.randomUUID) return prefix + '_' + crypto.randomUUID();
+  return prefix + '_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 10);
+}
+function formatTime(seconds) {
+  if (!isFinite(seconds) || seconds < 0) return '0:00';
+  const total = Math.floor(seconds);
+  const h = Math.floor(total / 3600);
+  const m = Math.floor((total % 3600) / 60);
+  const s = total % 60;
+  if (h > 0) return `${h}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+  return `${m}:${String(s).padStart(2, '0')}`;
+}
+function timeAgo(timestamp) {
+  const diff = Math.floor((Date.now() - timestamp) / 1000);
+  if (diff < 60) return 'الآن';
+  if (diff < 3600) return Math.floor(diff / 60) + ' دقيقة';
+  if (diff < 86400) return Math.floor(diff / 3600) + ' ساعة';
+  if (diff < 604800) return Math.floor(diff / 86400) + ' يوم';
+  return new Date(timestamp).toLocaleDateString('ar');
+}
+function daysBetween(a, b) { return Math.floor(Math.abs(b - a) / (1000 * 60 * 60 * 24)); }
+function trendingScore(post) {
+  const ageHours = (Date.now() - post.createdAt) / (1000 * 60 * 60);
+  const engagement = (post.likes?.length || 0) * 3 + (post.comments?.length || 0) * 2;
+  return engagement - ageHours * 0.5;
+}
+function formatText(text) {
+  const escaped = escapeHtml(text || '');
+  return escaped
+    .replace(/#([a-zA-Z0-9_\u0600-\u06FF]+)/g, (m, tag) => `<span data-hashtag="${escapeAttr(tag)}" style="color:var(--primary);cursor:pointer;font-weight:600;">#${escapeHtml(tag)}</span>`)
+    .replace(/@([a-zA-Z0-9_\u0600-\u06FF]+)/g, (m, name) => `<span data-mention="${escapeAttr(name)}" style="color:var(--primary);cursor:pointer;font-weight:600;">@${escapeHtml(name)}</span>`);
+}
+
+const Store = {
+  prefix: 'foxkio_movies_',
+  get(key, fallback) {
+    try {
+      const raw = localStorage.getItem(this.prefix + key);
+      if (raw === null) return fallback;
+      return JSON.parse(raw);
+    } catch (err) { return fallback; }
+  },
+  set(key, value) {
+    try { localStorage.setItem(this.prefix + key, JSON.stringify(value)); return true; }
+    catch (err) { return false; }
+  },
+  remove(key) { try { localStorage.removeItem(this.prefix + key); } catch (err) {} }
+};
+
+const Network = {
+  isOnline: navigator.onLine,
+  init() {
+    window.addEventListener('online', () => this._handle(true));
+    window.addEventListener('offline', () => this._handle(false));
+    this._update();
+  },
+  _handle(online) {
+    const was = this.isOnline;
+    this.isOnline = online;
+    this._update();
+    if (was !== online) {
+      toast(online ? 'عاد الاتصال بالإنترنت ✅' : 'انقطع الاتصال بالإنترنت', online ? 'success' : 'error', 3000);
+      if (online && App.user && !Videos.cache.length) Videos.load().then(() => { if (App.currentView === 'home') renderHome(); });
+    }
+  },
+  _update() {
+    const el = $('#connectionStatus');
+    if (el) el.classList.toggle('show', !this.isOnline);
+  }
+};
+
+const AppState = {
+  KEY: 'foxkio_app_state',
+  _scrollTimer: null,
+  _scrollBound: false,
+  _lastSavedScroll: 0,
+  save() {
+    if (!App.user) return;
+    const mc = $('#mainContent');
+    const scrollTop = mc ? mc.scrollTop : 0;
+    this._lastSavedScroll = scrollTop;
+    try {
+      localStorage.setItem(this.KEY, JSON.stringify({
+        userId: App.user.id,
+        view: App.currentView,
+        movieFilter: App.currentMovieFilter,
+        animeFilter: App.currentAnimeFilter,
+        peopleType: App.peopleType,
+        hashtag: App.currentHashtag,
+        userProfileUsername: App.currentUserProfile ? App.currentUserProfile.username : null,
+        previousView: App.previousView || null,
+        scrollTop: scrollTop,
+        ts: Date.now()
+      }));
+    } catch (e) {}
+  },
+  load() {
+    try {
+      const raw = localStorage.getItem(this.KEY);
+      if (!raw) return null;
+      const data = JSON.parse(raw);
+      if (!data || !App.user || data.userId !== App.user.id) return null;
+      return data;
+    } catch (e) { return null; }
+  },
+  clear() { try { localStorage.removeItem(this.KEY); } catch (e) {} },
+  bindScrollListener() {
+    if (this._scrollBound) return;
+    const mc = $('#mainContent');
+    if (!mc) return;
+    this._scrollBound = true;
+    mc.addEventListener('scroll', () => {
+      clearTimeout(this._scrollTimer);
+      this._scrollTimer = setTimeout(() => { if (App.user) this.save(); }, 600);
+    }, { passive: true });
+  }
+};
+
+function toast(message, type = 'info', duration = 3200) {
+  const el = document.createElement('div');
+  el.className = 'toast ' + type;
+  const iconId = type === 'success' ? 'i-check' : type === 'error' ? 'i-alert' : 'i-info';
+  el.innerHTML = `<svg class="icon"><use href="#${iconId}"/></svg><span>${escapeHtml(message)}</span>`;
+  $('#toastContainer').appendChild(el);
+  setTimeout(() => {
+    el.style.transition = 'opacity .3s, transform .3s';
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(10px)';
+    setTimeout(() => el.remove(), 320);
+  }, duration);
+}
+
+const CryptoUtils = {
+  async hashPassword(password, salt) {
+    const enc = new TextEncoder();
+    const keyMaterial = await crypto.subtle.importKey('raw', enc.encode(password), { name: 'PBKDF2' }, false, ['deriveBits']);
+    const bits = await crypto.subtle.deriveBits({ name: 'PBKDF2', salt: enc.encode(salt), iterations: 150000, hash: 'SHA-256' }, keyMaterial, 256);
+    return Array.from(new Uint8Array(bits)).map(b => b.toString(16).padStart(2, '0')).join('');
+  },
+  generateSalt() {
+    const arr = new Uint8Array(16);
+    crypto.getRandomValues(arr);
+    return Array.from(arr).map(b => b.toString(16).padStart(2, '0')).join('');
+  },
+  generateCode() {
+    const arr = new Uint32Array(1);
+    crypto.getRandomValues(arr);
+    return String(100000 + (arr[0] % 900000));
+  }
+};
+
+/* ══════════════════════════════════════════════════════════
+   Supabase Profile Helpers
+   ══════════════════════════════════════════════════════════ */
+async function sbFetchProfile(userId) {
+  if (!USE_SUPABASE) return null;
+  try {
+    const { data, error } = await supabaseClient.from('profiles').select('*').eq('id', userId).maybeSingle();
+    if (error && error.code !== 'PGRST116') console.warn('fetchProfile', error);
+    return data || null;
+  } catch (e) { return null; }
+}
+async function sbUpsertProfile(userId, username, extra = {}) {
+  if (!USE_SUPABASE) return null;
+  const payload = { id: userId, username, ...extra };
+  const { data, error } = await supabaseClient.from('profiles').upsert(payload, { onConflict: 'id' }).select().maybeSingle();
+  if (error) throw new Error(error.message);
+  return data;
+}
+async function sbUpdateProfile(userId, changes) {
+  if (!USE_SUPABASE) return null;
+  const { data, error } = await supabaseClient.from('profiles').update(changes).eq('id', userId).select().maybeSingle();
+  if (error) throw new Error(error.message);
+  return data;
+}
+function profileToUser(authUser, profile) {
+  const meta = (authUser && authUser.user_metadata) || {};
+  return {
+    id: authUser.id,
+    email: authUser.email || (profile && profile.email) || '',
+    username: (profile && profile.username) || meta.username || (authUser.email || 'user').split('@')[0],
+    avatar: (profile && profile.avatar_url) || '',
+    banner: (profile && profile.banner_url) || '',
+    bio: (profile && profile.bio) || '',
+    watchlist: (profile && profile.watchlist) || [],
+    watched: (profile && profile.watched) || [],
+    lastUsernameChange: (profile && profile.last_username_change) || 0,
+    createdAt: profile && profile.created_at ? new Date(profile.created_at).getTime() : Date.now()
+  };
+}
+async function resolveEmailByUsername(username) {
+  const u = String(username || '').trim();
+  if (!u) return null;
+  if (!USE_SUPABASE) {
+    const user = Auth.getUsers().find(x => x.username.toLowerCase() === u.toLowerCase());
+    return user ? user.email : null;
+  }
+  try {
+    const { data } = await supabaseClient.from('profiles').select('email').ilike('username', u).maybeSingle();
+    return data && data.email ? data.email : null;
+  } catch (e) { return null; }
+}
+
+/* ══════════════════════════════════════════════════════════
+   Auth
+   ══════════════════════════════════════════════════════════ */
+const Auth = {
+  USERS_KEY: 'users', SESSION_KEY: 'session', RESET_KEY: 'reset_codes',
+  getUsers() { return Store.get(this.USERS_KEY, []); },
+  saveUsers(users) { Store.set(this.USERS_KEY, users); },
+  async getSession() {
+    if (USE_SUPABASE) {
+      const { data } = await supabaseClient.auth.getSession();
+      return data.session || null;
+    }
+    const s = Store.get(this.SESSION_KEY, null);
+    if (!s || !s.userId || !s.expires) return null;
+    if (s.expires < Date.now()) { Store.remove(this.SESSION_KEY); return null; }
+    return s;
+  },
+  async clearSession() {
+    if (USE_SUPABASE) { await supabaseClient.auth.signOut(); return; }
+    Store.remove(this.SESSION_KEY);
+  },
+  async register({ username, email, password }) {
+    if (!username || username.length < 3) throw new Error('اسم المستخدم قصير جداً');
+    if (!/^[a-zA-Z0-9_\u0600-\u06FF]+$/.test(username)) throw new Error('اسم المستخدم يحتوي على رموز غير مسموحة');
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new Error('البريد غير صحيح');
+    if (!password || password.length < 6) throw new Error('كلمة المرور قصيرة جداً');
+
+    if (USE_SUPABASE) {
+      try {
+        const { data: existing } = await supabaseClient.from('profiles').select('id').ilike('username', username.trim()).maybeSingle();
+        if (existing) throw new Error('اسم المستخدم مستخدم بالفعل');
+      } catch (e) { if (/مستخدم/.test(e.message)) throw e; }
+
+      const { data, error } = await supabaseClient.auth.signUp({
+        email: email.toLowerCase().trim(), password,
+        options: { data: { username: username.trim() } }
+      });
+      if (error) {
+        const msg = (error.message || '').toLowerCase();
+        if (msg.includes('already registered')) throw new Error('هذا البريد مسجل مسبقاً');
+        throw new Error(error.message);
+      }
+      if (!data.user) throw new Error('فشل إنشاء الحساب');
+      if (data.session) {
+        try {
+          const profile = await sbUpsertProfile(data.user.id, username.trim(), {
+            email: data.user.email, avatar_url: '', bio: '', watchlist: [], watched: [], last_username_change: 0
+          });
+          if (profile) Store.set('profile_cache_' + data.user.id, profile);
+        } catch (e) { console.warn('Profile create deferred:', e); }
+        return profileToUser(data.user, { username: username.trim(), email: data.user.email });
+      }
+      return null;
+    }
+
+    const users = this.getUsers();
+    if (users.some(u => u.email === email.toLowerCase().trim())) throw new Error('هذا البريد مسجل مسبقاً');
+    if (users.some(u => u.username.toLowerCase() === username.toLowerCase().trim())) throw new Error('اسم المستخدم مستخدم بالفعل');
+    const salt = CryptoUtils.generateSalt();
+    const hash = await CryptoUtils.hashPassword(password, salt);
+    const user = {
+      id: uid('u'), username: username.trim(), email: email.toLowerCase().trim(),
+      salt, hash, avatar: '', banner: '', bio: '', createdAt: Date.now(),
+      lastUsernameChange: 0, watchlist: [], watched: []
+    };
+    users.push(user);
+    this.saveUsers(users);
+    Store.set(this.SESSION_KEY, { userId: user.id, expires: Date.now() + 30 * 86400000 });
+    return user;
+  },
+  async login(identifier, password) {
+    identifier = String(identifier || '').trim();
+    if (!identifier) throw new Error('أدخل البريد أو اسم المستخدم');
+    if (!password) throw new Error('أدخل كلمة المرور');
+
+    if (USE_SUPABASE) {
+      let email = identifier;
+      if (!identifier.includes('@')) {
+        const resolved = await resolveEmailByUsername(identifier);
+        if (!resolved) throw new Error('اسم المستخدم غير موجود');
+        email = resolved;
+      }
+      const { data, error } = await supabaseClient.auth.signInWithPassword({ email: email.toLowerCase().trim(), password });
+      if (error) {
+        const msg = (error.message || '').toLowerCase();
+        if (msg.includes('email not confirmed')) throw new Error('يرجى تأكيد بريدك الإلكتروني أولاً');
+        if (msg.includes('invalid login') || msg.includes('invalid credentials') || msg.includes('invalid')) throw new Error('البريد أو كلمة المرور غير صحيحة');
+        throw new Error(error.message || 'فشل تسجيل الدخول');
+      }
+      if (!data.user) throw new Error('فشل تسجيل الدخول');
+      let profile = await sbFetchProfile(data.user.id);
+      if (!profile) {
+        const uname = (data.user.user_metadata && data.user.user_metadata.username) || email.split('@')[0];
+        try {
+          profile = await sbUpsertProfile(data.user.id, uname, {
+            email: data.user.email, avatar_url: '', bio: '', watchlist: [], watched: [], last_username_change: 0
+          });
+        } catch (e) { console.warn(e); }
+      } else if (!profile.email) {
+        try { profile = await sbUpdateProfile(data.user.id, { email: data.user.email }); } catch (e) {}
+      }
+      if (profile) Store.set('profile_cache_' + data.user.id, profile);
+      return profileToUser(data.user, profile);
+    }
+
+    const user = this.getUsers().find(u => u.email === identifier.toLowerCase() || u.username.toLowerCase() === identifier.toLowerCase());
+    if (!user) throw new Error('البريد أو كلمة المرور غير صحيحة');
+    const hash = await CryptoUtils.hashPassword(password, user.salt);
+    if (hash !== user.hash) throw new Error('البريد أو كلمة المرور غير صحيحة');
+    Store.set(this.SESSION_KEY, { userId: user.id, expires: Date.now() + 30 * 86400000 });
+    return user;
+  },
+  async requestResetCode(email) {
+    if (USE_SUPABASE) {
+      const { error } = await supabaseClient.auth.resetPasswordForEmail(email.toLowerCase().trim(), { redirectTo: window.location.origin + window.location.pathname });
+      if (error) throw new Error(error.message);
+      return 'SENT';
+    }
+    const user = this.findUserByEmail(email);
+    if (!user) throw new Error('لا يوجد حساب بهذا البريد');
+    const codes = Store.get(this.RESET_KEY, {});
+    const code = CryptoUtils.generateCode();
+    codes[user.email] = { code, expires: Date.now() + 1000 * 60 * 10, attempts: 0 };
+    Store.set(this.RESET_KEY, codes);
+    return code;
+  },
+  findUserByEmail(email) { return this.getUsers().find(u => u.email === String(email).toLowerCase().trim()); },
+  async verifyResetCode(email, code) {
+    if (USE_SUPABASE) return true;
+    const key = String(email).toLowerCase().trim();
+    const codes = Store.get(this.RESET_KEY, {});
+    const entry = codes[key];
+    if (!entry) throw new Error('لم يتم طلب رمز لهذا البريد');
+    if (entry.expires < Date.now()) { delete codes[key]; Store.set(this.RESET_KEY, codes); throw new Error('انتهت صلاحية الرمز'); }
+    if (entry.attempts >= 5) throw new Error('محاولات كثيرة، اطلب رمزاً جديداً');
+    if (entry.code !== String(code).trim()) {
+      entry.attempts = (entry.attempts || 0) + 1; codes[key] = entry; Store.set(this.RESET_KEY, codes);
+      throw new Error('الرمز غير صحيح');
+    }
+    return true;
+  },
+  async resetPassword(email, code, newPassword) {
+    if (!newPassword || newPassword.length < 6) throw new Error('كلمة المرور قصيرة');
+    if (USE_SUPABASE) throw new Error('يرجى استخدام رابط إعادة التعيين المرسل إلى بريدك.');
+    await this.verifyResetCode(email, code);
+    const users = this.getUsers();
+    const user = users.find(u => u.email === String(email).toLowerCase().trim());
+    if (!user) throw new Error('المستخدم غير موجود');
+    user.salt = CryptoUtils.generateSalt();
+    user.hash = await CryptoUtils.hashPassword(newPassword, user.salt);
+    this.saveUsers(users);
+    const codes = Store.get(this.RESET_KEY, {});
+    delete codes[user.email]; Store.set(this.RESET_KEY, codes);
+    return true;
+  },
+  async changeUsername(userId, newUsername) {
+    if (!newUsername || newUsername.length < 3) throw new Error('اسم المستخدم قصير');
+    if (!/^[a-zA-Z0-9_\u0600-\u06FF]+$/.test(newUsername)) throw new Error('رموز غير مسموحة في الاسم');
+    if (USE_SUPABASE) {
+      const profile = await sbFetchProfile(userId);
+      if (!profile) throw new Error('الملف الشخصي غير موجود');
+      if (profile.username === newUsername) throw new Error('هذا اسمك الحالي');
+      const days = daysBetween(profile.last_username_change || 0, Date.now());
+      if (profile.last_username_change && days < 30) throw new Error(`لا يمكن التغيير قبل ${30 - days} يوم`);
+      const { data: taken } = await supabaseClient.from('profiles').select('id').ilike('username', newUsername).maybeSingle();
+      if (taken && taken.id !== userId) throw new Error('اسم المستخدم مستخدم مسبقاً');
+      const updated = await sbUpdateProfile(userId, { username: newUsername, last_username_change: Date.now() });
+      return { username: updated.username, lastUsernameChange: updated.last_username_change };
+    }
+    const users = this.getUsers();
+    const user = users.find(u => u.id === userId);
+    if (!user) throw new Error('المستخدم غير موجود');
+    if (newUsername === user.username) throw new Error('هذا اسمك الحالي');
+    if (users.some(u => u.id !== userId && u.username.toLowerCase() === newUsername.toLowerCase())) throw new Error('اسم المستخدم مستخدم مسبقاً');
+    const days = daysBetween(user.lastUsernameChange || 0, Date.now());
+    if (user.lastUsernameChange && days < 30) throw new Error(`لا يمكن التغيير قبل ${30 - days} يوم`);
+    user.username = newUsername;
+    user.lastUsernameChange = Date.now();
+    this.saveUsers(users);
+    return user;
+  },
+  async updateUser(userId, changes) {
+    if (USE_SUPABASE) {
+      const profileChanges = {};
+      if (changes.avatar !== undefined) profileChanges.avatar_url = changes.avatar;
+      if (changes.banner !== undefined) profileChanges.banner_url = changes.banner;
+      if (changes.bio !== undefined) profileChanges.bio = changes.bio;
+      if (changes.watchlist !== undefined) profileChanges.watchlist = changes.watchlist;
+      if (changes.watched !== undefined) profileChanges.watched = changes.watched;
+      // Try to update; if banner_url column missing, retry without it
+      if (Object.keys(profileChanges).length > 0) {
+        try {
+          await sbUpdateProfile(userId, profileChanges);
+        } catch (e) {
+          if (/column .*banner_url.* does not exist/i.test(e.message || '') && profileChanges.banner_url !== undefined) {
+            const { banner_url, ...rest } = profileChanges;
+            if (Object.keys(rest).length) await sbUpdateProfile(userId, rest);
+            // Fallback: store banner locally
+            try { localStorage.setItem('foxkio_banner_' + userId, changes.banner || ''); } catch (err) {}
+          } else { throw e; }
+        }
+      }
+      const { data: { user } } = await supabaseClient.auth.getUser();
+      const profile = await sbFetchProfile(userId);
+      if (user) Store.set('profile_cache_' + userId, profile);
+      return profileToUser(user, profile);
+    }
+    const users = this.getUsers();
+    const i = users.findIndex(u => u.id === userId);
+    if (i === -1) throw new Error('المستخدم غير موجود');
+    users[i] = { ...users[i], ...changes };
+    this.saveUsers(users);
+    return users[i];
+  }
+};
+
+function getBannerForUser(user, profileRow) {
+  if (profileRow && profileRow.banner_url) return profileRow.banner_url;
+  if (user && user.banner) return user.banner;
+  try { return localStorage.getItem('foxkio_banner_' + (user?.id || '')) || ''; } catch (e) { return ''; }
+}
+
+const Settings = {
+  DEFAULTS: { theme: 'dark', font: 'cairo', skipSeconds: 10 },
+  key(userId) { return 'settings_' + userId; },
+  get(userId) { return { ...this.DEFAULTS, ...(Store.get(this.key(userId), {})) }; },
+  save(userId, patch) {
+    const current = this.get(userId);
+    Store.set(this.key(userId), { ...current, ...patch });
+    return this.get(userId);
+  }
+};
+
+/* ══════════════════════════════════════════════════════════
+   Videos (unchanged logic)
+   ══════════════════════════════════════════════════════════ */
+function normalizeHFUrl(url) {
+  if (!url || typeof url !== 'string') return url;
+  const s = url.trim();
+  if (!/^https?:\/\//i.test(s)) return s;
+  return s.replace(/\/raw\/main\//, '/resolve/main/').replace(/\/raw\//, '/resolve/');
+}
+
+const Videos = {
+  endpoints: [
+    'https://huggingface.co/datasets/FoxQ/Videos/resolve/main/videos.json',
+    'https://huggingface.co/datasets/FoxQ/Videos/raw/main/videos.json'
+  ],
+  cache: [],
+  loading: false,
+  error: null,
+  _loadPromise: null,
+  CACHE_KEY: 'videos_cache_v3',
+  CACHE_TTL: 3600000,
+
+  pickString(obj, keys) {
+    for (const k of keys) {
+      const v = obj[k];
+      if (typeof v === 'string' && v.trim()) return v.trim();
+      if (v && typeof v === 'object') {
+        const nested = this.pickString(v, ['url', 'src', 'path', 'value', 'name', 'title']);
+        if (nested) return nested;
+      }
+      if (Array.isArray(v) && v.length && typeof v[0] === 'string') return v.join(', ');
+    }
+    return '';
+  },
+  normalize(raw, index) {
+    if (!raw || typeof raw !== 'object') return null;
+    const title = sanitizeText(this.pickString(raw, ['title', 'name', 'movie_title', 'movieTitle', 'original_title', 'arabic_title']) || `فيديو رقم ${index + 1}`, 200);
+    let videoUrl = this.pickString(raw, ['video_url', 'videoUrl', 'url', 'video', 'link', 'src', 'source', 'stream', 'mp4']);
+    if (!videoUrl && raw.metadata) videoUrl = this.pickString(raw.metadata, ['url', 'video_url', 'video', 'src']);
+    if (!videoUrl && Array.isArray(raw.sources)) { const s = raw.sources.find(x => x && (x.url || x.src)); if (s) videoUrl = s.url || s.src; }
+    let poster = this.pickString(raw, ['poster', 'poster_url', 'image', 'thumbnail', 'thumb', 'cover', 'posterImage']);
+    if (!poster && raw.metadata) poster = this.pickString(raw.metadata, ['poster', 'poster_url', 'image', 'thumbnail']);
+    const description = sanitizeText(this.pickString(raw, ['description', 'desc', 'plot', 'overview', 'summary', 'synopsis', 'story']), 5000);
+    let categoriesRaw = raw.categories || raw.category || raw.genres || raw.genre || raw.tags || raw.type || [];
+    if (typeof categoriesRaw === 'string') categoriesRaw = categoriesRaw.split(/[,،;|/]/).map(s => s.trim()).filter(Boolean);
+    if (!Array.isArray(categoriesRaw)) categoriesRaw = [];
+    const categories = categoriesRaw.map(s => sanitizeText(s, 40)).filter(Boolean);
+    const categoryText = categories.join(' ').toLowerCase();
+    const typeText = (raw.type || '').toString().toLowerCase();
+    const isAnime = /anime|أنمي|انمي|كرتون|animation/.test(categoryText + ' ' + typeText + ' ' + title.toLowerCase());
+    let actorsRaw = raw.actors || raw.cast || raw.stars || raw.actor || raw.actors_list || raw.cast_list || [];
+    if (typeof actorsRaw === 'string') actorsRaw = actorsRaw.split(/[,،;|/]/).map(s => s.trim()).filter(Boolean);
+    if (!Array.isArray(actorsRaw)) actorsRaw = [];
+    const actors = actorsRaw.map(a => {
+      if (typeof a === 'string') return { name: sanitizeText(a, 80), image: '' };
+      if (a && typeof a === 'object') return { name: sanitizeText((a.name || a.title || a.actor_name || '').toString(), 80), image: safeUrl(a.image || a.photo || a.avatar || '') };
+      return null;
+    }).filter(a => a && a.name);
+    const studio = sanitizeText(this.pickString(raw, ['studio', 'production', 'production_company', 'company', 'producer']), 120);
+    const author = sanitizeText(this.pickString(raw, ['author', 'director', 'creator', 'writer', 'director_name']), 120);
+    const year = parseInt(raw.year || raw.release_year || raw.releaseYear, 10) || null;
+    const rating = parseFloat(raw.rating || raw.score || raw.imdb || raw.imdb_rating) || null;
+    const duration = parseInt(raw.duration || raw.length || raw.runtime, 10) || null;
+    const skipIntro = parseInt(raw.skip_intro || raw.skipIntro, 10) || 0;
+    const id = raw.id ? String(raw.id) : 'v_' + index + '_' + title.replace(/\s+/g, '_').slice(0, 30);
+    return { id, title, videoUrl: safeUrl(normalizeHFUrl(videoUrl)), poster: safeUrl(normalizeHFUrl(poster)), description, categories, isAnime, actors, studio, author, year, rating, duration, skipIntro, raw };
+  },
+  async load(force = false) {
+    if (this._loadPromise) return this._loadPromise;
+    if (!force) {
+      const cached = Store.get(this.CACHE_KEY, null);
+      if (cached && cached.ts && (Date.now() - cached.ts) < this.CACHE_TTL && Array.isArray(cached.data) && cached.data.length) {
+        this.cache = cached.data;
+        return this.cache;
+      }
+    }
+    this._loadPromise = this._doLoad();
+    try { return await this._loadPromise; }
+    finally { this._loadPromise = null; }
+  },
+  async _doLoad() {
+    this.loading = true; this.error = null;
+    let data = null;
+    for (const url of this.endpoints) {
+      try {
+        const ctrl = new AbortController();
+        const timeout = setTimeout(() => ctrl.abort(), 15000);
+        const res = await fetch(url, { cache: 'no-store', credentials: 'omit', headers: { 'Accept': 'application/json' }, signal: ctrl.signal });
+        clearTimeout(timeout);
+        if (res.ok) { data = await res.json(); break; }
+      } catch (e) {}
+    }
+    if (!data) {
+      const cached = Store.get(this.CACHE_KEY, null);
+      if (cached && cached.data && cached.data.length) {
+        this.cache = cached.data;
+        this.loading = false;
+        return this.cache;
+      }
+      this.error = 'تعذر الاتصال بمصدر الأفلام';
+      this.loading = false;
+      return [];
+    }
+    let list = [];
+    if (Array.isArray(data)) list = data;
+    else if (data && typeof data === 'object') {
+      const candidates = ['videos', 'data', 'items', 'results', 'movies', 'list'];
+      for (const k of candidates) if (Array.isArray(data[k])) { list = data[k]; break; }
+      if (list.length === 0) for (const v of Object.values(data)) if (Array.isArray(v)) { list = v; break; }
+    }
+    const normalized = [];
+    list.forEach((item, i) => { const n = this.normalize(item, i); if (n) normalized.push(n); });
+    this.cache = normalized;
+    this.loading = false;
+    try { Store.set(this.CACHE_KEY, { ts: Date.now(), data: normalized }); } catch (e) {}
+    return normalized;
+  },
+  getMovies() { return this.cache.filter(v => !v.isAnime); },
+  getAnime() { return this.cache.filter(v => v.isAnime); },
+  findById(id) { return this.cache.find(v => v.id === id) || null; },
+  allCategories(list) { const s = new Set(); list.forEach(v => v.categories.forEach(c => s.add(c))); return Array.from(s).sort(); },
+  allActors(list) {
+    const map = new Map();
+    list.forEach(v => v.actors.forEach(a => {
+      if (!map.has(a.name)) map.set(a.name, { name: a.name, image: a.image, count: 0, items: [] });
+      map.get(a.name).count++; map.get(a.name).items.push(v);
+    }));
+    return Array.from(map.values()).sort((a, b) => b.count - a.count);
+  },
+  allStudios(list) {
+    const map = new Map();
+    list.forEach(v => { if (!v.studio) return; if (!map.has(v.studio)) map.set(v.studio, { name: v.studio, count: 0, items: [] }); map.get(v.studio).count++; map.get(v.studio).items.push(v); });
+    return Array.from(map.values()).sort((a, b) => b.count - a.count);
+  },
+  allAuthors(list) {
+    const map = new Map();
+    list.forEach(v => { if (!v.author) return; if (!map.has(v.author)) map.set(v.author, { name: v.author, count: 0, items: [] }); map.get(v.author).count++; map.get(v.author).items.push(v); });
+    return Array.from(map.values()).sort((a, b) => b.count - a.count);
+  }
+};
+
+/* ══════════════════════════════════════════════════════════
+   Social (posts/comments/follows — unchanged)
+   ══════════════════════════════════════════════════════════ */
+const Social = {
+  POSTS_KEY: 'social_posts',
+
+  async getPosts() {
+    if (USE_SUPABASE) {
+      try {
+        const { data, error } = await supabaseClient
+          .from('posts')
+          .select('*, comments(*, comment_likes(user_id)), likes(user_id)')
+          .order('created_at', { ascending: false });
+        if (error) throw error;
+        return (data || []).map(p => {
+          const comments = (p.comments || []).map(c => ({
+            id: c.id, userId: c.user_id, username: c.username,
+            avatar: c.avatar_url || '', text: c.content,
+            createdAt: new Date(c.created_at).getTime(),
+            parentId: c.parent_id || null,
+            likes: (c.comment_likes || []).map(l => l.user_id)
+          }));
+          return {
+            id: p.id, userId: p.user_id, username: p.username,
+            avatar: p.avatar_url || '', text: p.content || '', image: p.image_url || '',
+            createdAt: new Date(p.created_at).getTime(),
+            likes: (p.likes || []).map(l => l.user_id),
+            comments
+          };
+        });
+      } catch (e) { console.warn('getPosts', e); return []; }
+    }
+    return Store.get(this.POSTS_KEY, []);
+  },
+
+  async createPost(user, { text, image }) {
+    text = sanitizeText(text, 500);
+    if (!text && !image) throw new Error('لا يمكن النشر فارغاً');
+    if (USE_SUPABASE) {
+      const { data, error } = await supabaseClient.from('posts').insert({
+        user_id: user.id, username: user.username, avatar_url: user.avatar || null,
+        content: String(text || '').slice(0, 500), image_url: image || null
+      }).select().maybeSingle();
+      if (error) throw new Error(error.message);
+      return { id: data.id, userId: user.id, username: user.username, avatar: user.avatar || '', text: text || '', image: image || '', createdAt: Date.now(), likes: [], comments: [] };
+    }
+    const posts = Store.get(this.POSTS_KEY, []);
+    const post = { id: uid('p'), userId: user.id, username: user.username, avatar: user.avatar || '', text: String(text || '').slice(0, 500), image: image || '', createdAt: Date.now(), likes: [], comments: [] };
+    posts.unshift(post);
+    Store.set(this.POSTS_KEY, posts);
+    return post;
+  },
+
+  async deletePost(postId, userId) {
+    if (USE_SUPABASE) {
+      const { error } = await supabaseClient.from('posts').delete().eq('id', postId).eq('user_id', userId);
+      if (error) throw new Error(error.message);
+      return true;
+    }
+    const posts = Store.get(this.POSTS_KEY, []);
+    const idx = posts.findIndex(p => p.id === postId);
+    if (idx === -1 || posts[idx].userId !== userId) return false;
+    posts.splice(idx, 1); Store.set(this.POSTS_KEY, posts);
+    return true;
+  },
+
+  async toggleLike(postId, userId) {
+    if (USE_SUPABASE) {
+      const { data: existing } = await supabaseClient.from('likes').select('id').eq('post_id', postId).eq('user_id', userId).maybeSingle();
+      let liked;
+      if (existing) { await supabaseClient.from('likes').delete().eq('id', existing.id); liked = false; }
+      else { await supabaseClient.from('likes').insert({ post_id: postId, user_id: userId }); liked = true; }
+      const { count } = await supabaseClient.from('likes').select('*', { count: 'exact', head: true }).eq('post_id', postId);
+      return { liked, count: count || 0 };
+    }
+    const posts = Store.get(this.POSTS_KEY, []);
+    const post = posts.find(p => p.id === postId);
+    if (!post) return { liked: false, count: 0 };
+    const idx = post.likes.indexOf(userId);
+    let liked;
+    if (idx === -1) { post.likes.push(userId); liked = true; } else { post.likes.splice(idx, 1); liked = false; }
+    Store.set(this.POSTS_KEY, posts);
+    return { liked, count: post.likes.length };
+  },
+
+  async addComment(postId, user, text, parentId = null) {
+    text = sanitizeText(text, 300);
+    if (!text) throw new Error('تعليق فارغ');
+    if (USE_SUPABASE) {
+      const row = { post_id: postId, user_id: user.id, username: user.username, avatar_url: user.avatar || null, content: text.slice(0, 300) };
+      if (parentId) row.parent_id = parentId;
+      const { data, error } = await supabaseClient.from('comments').insert(row).select().maybeSingle();
+      if (error) throw new Error(error.message);
+      return { id: data.id, userId: user.id, username: user.username, avatar: user.avatar || '', text, createdAt: Date.now(), parentId: parentId || null, likes: [] };
+    }
+    const posts = Store.get(this.POSTS_KEY, []);
+    const post = posts.find(p => p.id === postId);
+    if (!post) throw new Error('المنشور غير موجود');
+    const c = { id: uid('c'), userId: user.id, username: user.username, avatar: user.avatar || '', text: text.slice(0, 300), createdAt: Date.now(), parentId: parentId || null, likes: [] };
+    post.comments.push(c);
+    Store.set(this.POSTS_KEY, posts);
+    return c;
+  },
+
+  async deleteComment(postId, commentId, userId) {
+    if (USE_SUPABASE) {
+      const { error } = await supabaseClient.from('comments').delete().eq('id', commentId).eq('user_id', userId);
+      if (error) throw new Error(error.message);
+      return true;
+    }
+    const posts = Store.get(this.POSTS_KEY, []);
+    const post = posts.find(p => p.id === postId);
+    if (!post) return false;
+    const toRemove = new Set([commentId]);
+    let changed = true;
+    while (changed) {
+      changed = false;
+      post.comments.forEach(c => {
+        if (c.parentId && toRemove.has(c.parentId) && !toRemove.has(c.id)) { toRemove.add(c.id); changed = true; }
+      });
+    }
+    const before = post.comments.length;
+    post.comments = post.comments.filter(c => !toRemove.has(c.id));
+    if (post.comments.length === before) return false;
+    Store.set(this.POSTS_KEY, posts);
+    return true;
+  },
+
+  async toggleCommentLike(postId, commentId, userId) {
+    if (USE_SUPABASE) {
+      const { data: existing } = await supabaseClient.from('comment_likes').select('id').eq('comment_id', commentId).eq('user_id', userId).maybeSingle();
+      let liked;
+      if (existing) { await supabaseClient.from('comment_likes').delete().eq('id', existing.id); liked = false; }
+      else { await supabaseClient.from('comment_likes').insert({ comment_id: commentId, user_id: userId }); liked = true; }
+      const { count } = await supabaseClient.from('comment_likes').select('*', { count: 'exact', head: true }).eq('comment_id', commentId);
+      return { liked, count: count || 0 };
+    }
+    const posts = Store.get(this.POSTS_KEY, []);
+    const post = posts.find(p => p.id === postId);
+    if (!post) return { liked: false, count: 0 };
+    const c = post.comments.find(x => x.id === commentId);
+    if (!c) return { liked: false, count: 0 };
+    if (!c.likes) c.likes = [];
+    const idx = c.likes.indexOf(userId);
+    let liked;
+    if (idx === -1) { c.likes.push(userId); liked = true; } else { c.likes.splice(idx, 1); liked = false; }
+    Store.set(this.POSTS_KEY, posts);
+    return { liked, count: c.likes.length };
+  },
+
+  async userPostCount(userId) {
+    if (USE_SUPABASE) {
+      const { count } = await supabaseClient.from('posts').select('*', { count: 'exact', head: true }).eq('user_id', userId);
+      return count || 0;
+    }
+    return Store.get(this.POSTS_KEY, []).filter(p => p.userId === userId).length;
+  },
+
+  async toggleFollow(followerId, followingId) {
+    if (followerId === followingId) return false;
+    if (USE_SUPABASE) {
+      const { data: existing } = await supabaseClient.from('follows').select('id').eq('follower_id', followerId).eq('following_id', followingId).maybeSingle();
+      if (existing) { await supabaseClient.from('follows').delete().eq('id', existing.id); return false; }
+      await supabaseClient.from('follows').insert({ follower_id: followerId, following_id: followingId });
+      return true;
+    }
+    const key = 'follows_' + followerId;
+    const list = Store.get(key, []);
+    const idx = list.indexOf(followingId);
+    if (idx === -1) { list.push(followingId); Store.set(key, list); return true; }
+    list.splice(idx, 1); Store.set(key, list); return false;
+  },
+
+  async getFollowing(userId) {
+    if (USE_SUPABASE) {
+      const { data } = await supabaseClient.from('follows').select('following_id').eq('follower_id', userId);
+      return (data || []).map(f => f.following_id);
+    }
+    return Store.get('follows_' + userId, []);
+  },
+
+  async getFollowCounts(userId) {
+    if (USE_SUPABASE) {
+      const [{ count: following }, { count: followers }] = await Promise.all([
+        supabaseClient.from('follows').select('*', { count: 'exact', head: true }).eq('follower_id', userId),
+        supabaseClient.from('follows').select('*', { count: 'exact', head: true }).eq('following_id', userId)
+      ]);
+      return { following: following || 0, followers: followers || 0 };
+    }
+    const following = Store.get('follows_' + userId, []).length;
+    let followers = 0;
+    try { Auth.getUsers().forEach(u => { if (Store.get('follows_' + u.id, []).includes(userId)) followers++; }); } catch (e) {}
+    return { following, followers };
+  },
+
+  async getFollowersProfiles(userId) {
+    if (!USE_SUPABASE) return [];
+    const { data: follows } = await supabaseClient.from('follows').select('follower_id').eq('following_id', userId);
+    if (!follows || !follows.length) return [];
+    const ids = follows.map(f => f.follower_id);
+    const { data: profiles } = await supabaseClient.from('profiles').select('id, username, avatar_url, bio').in('id', ids);
+    return profiles || [];
+  },
+
+  async getFollowingProfiles(userId) {
+    if (!USE_SUPABASE) return [];
+    const { data: follows } = await supabaseClient.from('follows').select('following_id').eq('follower_id', userId);
+    if (!follows || !follows.length) return [];
+    const ids = follows.map(f => f.following_id);
+    const { data: profiles } = await supabaseClient.from('profiles').select('id, username, avatar_url, bio').in('id', ids);
+    return profiles || [];
+  },
+
+  async getProfileByUsername(username) {
+    if (!USE_SUPABASE) return null;
+    try {
+      const safe = String(username || '').trim();
+      if (!safe || !/^[a-zA-Z0-9_\u0600-\u06FF]+$/.test(safe)) return null;
+      const { data } = await supabaseClient.from('profiles').select('*').ilike('username', safe).maybeSingle();
+      return data || null;
+    } catch (e) { return null; }
+  },
+
+  async getUserPosts(userId) {
+    if (USE_SUPABASE) {
+      try {
+        const { data, error } = await supabaseClient
+          .from('posts')
+          .select('*, comments(*, comment_likes(user_id)), likes(user_id)')
+          .eq('user_id', userId)
+          .order('created_at', { ascending: false });
+        if (error) throw error;
+        return (data || []).map(p => {
+          const comments = (p.comments || []).map(c => ({
+            id: c.id, userId: c.user_id, username: c.username,
+            avatar: c.avatar_url || '', text: c.content,
+            createdAt: new Date(c.created_at).getTime(),
+            parentId: c.parent_id || null,
+            likes: (c.comment_likes || []).map(l => l.user_id)
+          }));
+          return {
+            id: p.id, userId: p.user_id, username: p.username,
+            avatar: p.avatar_url || '', text: p.content || '', image: p.image_url || '',
+            createdAt: new Date(p.created_at).getTime(),
+            likes: (p.likes || []).map(l => l.user_id),
+            comments
+          };
+        });
+      } catch (e) { return []; }
+    }
+    return Store.get(this.POSTS_KEY, []).filter(p => p.userId === userId);
+  }
+};
+
+/* ══════════════════════════════════════════════════════════
+   App state
+   ══════════════════════════════════════════════════════════ */
+const App = {
+  user: null, settings: null, currentView: 'home',
+  currentMovieFilter: 'all', currentAnimeFilter: 'all',
+  peopleType: 'actors', searchQuery: '',
+  selectedPostImage: '', searchDebounce: null,
+  searchOriginalView: null, _eventsBound: false, _peopleBound: false,
+  currentHashtag: null, _socialPollTimer: null, _socialLastHash: '',
+  _profileStatsCache: null,
+  currentUserProfile: null,
+  currentUserProfileStats: null,
+  previousView: null
+};
+
+function applyTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  const label = $('#themeToggleLabel');
+  if (label) label.textContent = theme === 'dark' ? 'الوضع الفاتح' : 'الوضع الداكن';
+  if (App.settings) App.settings.theme = theme;
+}
+function applyFont(font) { document.documentElement.setAttribute('data-font', font); }
+function toggleTheme() {
+  if (!App.user) return;
+  const current = document.documentElement.getAttribute('data-theme') || 'dark';
+  const next = current === 'dark' ? 'light' : 'dark';
+  applyTheme(next);
+  App.settings = Settings.save(App.user.id, { theme: next });
+  syncThemeToggle();
+}
+function syncThemeToggle() {
+  const t = $('#stTheme');
+  if (t) t.classList.toggle('on', (App.settings?.theme || 'dark') === 'light');
+}
+async function fileToDataUrl(file, maxSize = 400) {
+  if (!file || !file.type.startsWith('image/')) throw new Error('يجب اختيار صورة');
+  if (file.size > 8 * 1024 * 1024) throw new Error('حجم الصورة كبير جداً (الحد 8MB)');
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    const reader = new FileReader();
+    reader.onload = () => { img.src = reader.result; };
+    img.onload = () => {
+      let { width, height } = img;
+      if (width > height) { if (width > maxSize) { height = Math.round(height * maxSize / width); width = maxSize; } }
+      else { if (height > maxSize) { width = Math.round(width * maxSize / height); height = maxSize; } }
+      const canvas = document.createElement('canvas');
+      canvas.width = width; canvas.height = height;
+      canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+      resolve(canvas.toDataURL('image/jpeg', 0.85));
+    };
+    img.onerror = () => reject(new Error('فشل قراءة الصورة'));
+    reader.readAsDataURL(file);
+  });
+}
+function userInitials(username) {
+  const clean = String(username || '?').trim();
+  if (!clean) return '?';
+  return clean.substring(0, 2).toUpperCase();
+}
+function avatarHtml(user, size = 'md', clickable = false) {
+  const cls = size === 'sm' ? 'post-avatar' : 'comment-avatar';
+  const dataAttr = clickable ? ` data-user-avatar="${escapeAttr(user.username || '')}"` : '';
+  if (user && user.avatar) {
+    const safe = safeImgUrl(user.avatar);
+    if (safe) return `<img class="${cls}" src="${safe}" alt=""${dataAttr}>`;
+  }
+  const initials = userInitials(user ? (user.username || '') : '?');
+  return `<div class="${cls}"${dataAttr}>${escapeHtml(initials)}</div>`;
+}
+
+/* ══════════════════════════════════════════════════════════
+   Auth UI
+   ══════════════════════════════════════════════════════════ */
+function switchAuthTab(tab) {
+  $('#tabLogin').classList.toggle('active', tab === 'login');
+  $('#tabRegister').classList.toggle('active', tab === 'register');
+  $('#formLogin').classList.toggle('active', tab === 'login');
+  $('#formRegister').classList.toggle('active', tab === 'register');
+}
+async function handleLogin(event) {
+  event.preventDefault();
+  event.stopImmediatePropagation();
+  const identifier = $('#loginEmail').value.trim();
+  const password = $('#loginPassword').value;
+  const errEl = $('#loginError');
+  const btn = event.target.querySelector('button[type="submit"]');
+  errEl.textContent = '';
+  if (!identifier) { errEl.textContent = 'أدخل البريد أو اسم المستخدم'; return; }
+  if (!password) { errEl.textContent = 'أدخل كلمة المرور'; return; }
+  if (btn) btn.disabled = true;
+  try {
+    const user = await Auth.login(identifier, password);
+    await onLoginSuccess(user);
+  } catch (err) { errEl.textContent = err.message || 'خطأ في تسجيل الدخول'; }
+  finally { if (btn) btn.disabled = false; }
+}
+async function handleRegister(event) {
+  event.preventDefault();
+  event.stopImmediatePropagation();
+  const username = $('#regUsername').value.trim();
+  const email = $('#regEmail').value.trim();
+  const password = $('#regPassword').value;
+  const confirm = $('#regPasswordConfirm').value;
+  const errEl = $('#registerError');
+  const btn = event.target.querySelector('button[type="submit"]');
+  errEl.textContent = '';
+  if (password !== confirm) { errEl.textContent = 'كلمتا المرور غير متطابقتين'; return; }
+  if (btn) btn.disabled = true;
+  try {
+    const user = await Auth.register({ username, email, password });
+    if (!user) {
+      toast('تم إنشاء الحساب. تفقد بريدك لتأكيد الحساب ثم سجل الدخول.', 'success', 6000);
+      switchAuthTab('login');
+      return;
+    }
+    toast('تم إنشاء حسابك بنجاح', 'success');
+    await onLoginSuccess(user);
+  } catch (err) { errEl.textContent = err.message || 'خطأ في التسجيل'; }
+  finally { if (btn) btn.disabled = false; }
+}
+async function onLoginSuccess(user) {
+  App.user = user;
+  App.settings = Settings.get(user.id);
+  applyTheme(App.settings.theme);
+  applyFont(App.settings.font);
+  try { localStorage.setItem('foxkio_session_marker', '1'); } catch (e) {}
+  hideSplash();
+  showScreen('appScreen');
+  await enterApp();
+}
+function showScreen(id) {
+  $$('.screen').forEach(s => s.classList.toggle('active', s.id === id));
+}
+function hideSplash() {
+  const s = $('#splashScreen');
+  if (s) s.classList.add('hidden');
+}
+async function logout() {
+  await Auth.clearSession();
+  App.user = null;
+  App.settings = null;
+  App._profileStatsCache = null;
+  App.currentUserProfile = null;
+  App.currentUserProfileStats = null;
+  App.previousView = null;
+  App._socialLastHash = '';
+  App.currentHashtag = null;
+  AppState.clear();
+  $('#loginEmail').value = '';
+  $('#loginPassword').value = '';
+  $('#loginError').textContent = '';
+  try { localStorage.removeItem('foxkio_session_marker'); } catch (e) {}
+  showScreen('authScreen');
+  toast('تم تسجيل الخروج', 'info');
+}
+
+/* ══════════════════════════════════════════════════════════
+   Forgot password
+   ══════════════════════════════════════════════════════════ */
+function openForgotPasswordModal() {
+  openGenericModal(`
+    <div class="modal-panel">
+      <button class="modal-close" data-modal-close="forgot" type="button"><svg class="icon"><use href="#i-close"/></svg></button>
+      <h3><svg class="icon"><use href="#i-key"/></svg> استعادة كلمة المرور</h3>
+      <p class="modal-sub">أدخل بريدك الإلكتروني لإعادة تعيين كلمة المرور</p>
+      <div id="forgotStep1">
+        <input id="forgotEmail" class="field" type="email" placeholder="البريد الإلكتروني">
+        <p id="forgotError1" class="err"></p>
+        <button class="btn primary block" id="forgotSendBtn" type="button">إرسال</button>
+      </div>
+    </div>
+  `);
+  $('#forgotSendBtn').addEventListener('click', async () => {
+    const email = $('#forgotEmail').value.trim();
+    const errEl = $('#forgotError1');
+    errEl.textContent = '';
+    if (!email) { errEl.textContent = 'أدخل البريد'; return; }
+    try {
+      const result = await Auth.requestResetCode(email);
+      if (result === 'SENT') {
+        $('#forgotStep1').innerHTML = `
+          <div class="email-code-box">
+            <div class="label"><svg class="icon icon-sm"><use href="#i-mail"/></svg> تم الإرسال</div>
+            <div style="font-size:14px;line-height:1.8;color:var(--text-dim);padding:8px;">
+              ✅ تم إرسال رابط إعادة التعيين إلى بريدك.<br>تفقد صندوق الوارد (بما في ذلك مجلد الرسائل غير المرغوب فيها).
+            </div>
+          </div>`;
+      }
+    } catch (err) { errEl.textContent = err.message; }
+  });
+}
+
+/* ══════════════════════════════════════════════════════════
+   App entry — FIXED state restoration
+   ══════════════════════════════════════════════════════════ */
+async function enterApp() {
+  await refreshUserUI();
+  setupAppEvents();
+  AppState.bindScrollListener();
+
+  // Make sure videos are loaded before restoring video-dependent views
+  if (!Videos.cache.length) {
+    $('#homeSections').innerHTML = `<div class="loader"><div class="spinner"></div><p>جاري تحميل الأفلام...</p></div>`;
+    await Videos.load();
+  }
+
+  const state = AppState.load();
+  if (state) {
+    if (state.movieFilter) App.currentMovieFilter = state.movieFilter;
+    if (state.animeFilter) App.currentAnimeFilter = state.animeFilter;
+    if (state.peopleType) App.peopleType = state.peopleType;
+    if (state.hashtag) App.currentHashtag = state.hashtag;
+    if (state.previousView) App.previousView = state.previousView;
+    if (state.view === 'userprofile' && state.userProfileUsername) {
+      try {
+        const profile = await Social.getProfileByUsername(state.userProfileUsername);
+        if (profile) App.currentUserProfile = profile;
+      } catch (e) {}
+    }
+  }
+
+  const startView = (state && state.view && state.view !== 'userprofile') ? state.view
+                  : (state && state.view === 'userprofile' && App.currentUserProfile) ? 'userprofile'
+                  : 'home';
+
+  await showView(startView, { skipSave: true, skipScrollReset: true });
+
+  // Restore scroll position with retries (content may still be rendering)
+  if (state && state.scrollTop && state.scrollTop > 0) {
+    let attempts = 0;
+    const tryRestore = () => {
+      const mc = $('#mainContent');
+      if (!mc) return;
+      mc.scrollTop = state.scrollTop;
+      if (mc.scrollTop < state.scrollTop - 4 && attempts < 12) {
+        attempts++;
+        requestAnimationFrame(tryRestore);
+      }
+    };
+    requestAnimationFrame(tryRestore);
+  }
+}
+
+async function refreshUserUI() {
+  if (!App.user) return;
+  const avatarEl = $('#topbarAvatar');
+  if (avatarEl) {
+    const safe = App.user.avatar ? safeImgUrl(App.user.avatar) : '';
+    if (safe) avatarEl.src = safe;
+    else avatarEl.src = 'data:image/svg+xml;utf8,' + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" fill="#333"/><text x="32" y="42" font-size="26" text-anchor="middle" fill="#fff" font-family="sans-serif" font-weight="bold">${escapeHtml(userInitials(App.user.username))}</text></svg>`);
+  }
+  const fontSel = $('#stFont'); if (fontSel) fontSel.value = App.settings.font;
+  const skipRange = $('#stSkipRange'); if (skipRange) skipRange.value = App.settings.skipSeconds;
+  const skipVal = $('#stSkipValue');
+  if (skipVal) skipVal.textContent = App.settings.skipSeconds + ' ثوانٍ' + (App.settings.skipSeconds === 10 ? ' (الافتراضي)' : '');
+  syncThemeToggle();
+  updateUsernameStatus();
+
+  // Profile avatar
+  const profAvatar = $('#profileAvatar');
+  if (profAvatar) {
+    const safe = App.user.avatar ? safeImgUrl(App.user.avatar) : '';
+    if (safe) { profAvatar.style.backgroundImage = `url('${safe}')`; profAvatar.textContent = ''; }
+    else { profAvatar.style.backgroundImage = ''; profAvatar.textContent = userInitials(App.user.username); }
+  }
+  // Profile banner
+  const bannerEl = $('#profileBanner');
+  if (bannerEl) {
+    const bannerUrl = getBannerForUser(App.user, null);
+    const safe = bannerUrl ? safeImgUrl(bannerUrl) : '';
+    if (safe) { bannerEl.style.backgroundImage = `url('${safe}')`; }
+    else {
+      bannerEl.style.backgroundImage = '';
+    }
+  }
+  const dn = $('#profileDisplayName'); if (dn) dn.textContent = App.user.username;
+  const em = $('#profileEmail'); if (em) em.textContent = App.user.email;
+  const jn = $('#profileJoined');
+  if (jn) jn.textContent = 'عضو منذ ' + new Date(App.user.createdAt).toLocaleDateString('ar');
+  const bio = $('#profileBio'); if (bio) bio.value = App.user.bio || '';
+  // Stats
+  const stats = $('#profileStats');
+  if (stats) {
+    if (!App._profileStatsCache) {
+      try {
+        const postCount = await Social.userPostCount(App.user.id);
+        const watchCount = (App.user.watched || []).length;
+        const counts = await Social.getFollowCounts(App.user.id);
+        App._profileStatsCache = { postCount, watchCount, counts };
+      } catch (e) {}
+    }
+    if (App._profileStatsCache) {
+      const { postCount, watchCount, counts } = App._profileStatsCache;
+      stats.innerHTML = `${postCount} منشور · ${watchCount} فيلم تمت مشاهدته · <a href="#" data-show-followers="${escapeAttr(App.user.id)}" style="color:var(--primary);font-weight:700;text-decoration:none;">${counts.followers} متابع</a> · <a href="#" data-show-following="${escapeAttr(App.user.id)}" style="color:var(--primary);font-weight:700;text-decoration:none;">${counts.following} يتابع</a>`;
+    }
+  }
+}
+function updateUsernameStatus() {
+  const el = $('#stUsernameStatus');
+  if (!el || !App.user) return;
+  const days = daysBetween(App.user.lastUsernameChange || 0, Date.now());
+  if (!App.user.lastUsernameChange) el.textContent = 'متاح للتغيير';
+  else if (days < 30) el.textContent = `متبقي ${30 - days} يوم للتغيير`;
+  else el.textContent = 'متاح للتغيير';
+}
+
+async function showView(name, options = {}) {
+  App.currentView = name;
+  $$('.view').forEach(v => v.classList.toggle('active', v.id === 'view-' + name));
+  $$('.nav-btn[data-view], .mobile-nav button[data-view]').forEach(b => b.classList.toggle('active', b.dataset.view === name));
+
+  if (name === 'home') renderHome();
+  else if (name === 'movies') renderMoviesView();
+  else if (name === 'anime') renderAnimeView();
+  else if (name === 'people') renderPeopleView();
+  else if (name === 'social') { await renderSocialView(); startSocialPoll(); }
+  else if (name === 'watchlist') renderWatchlistView();
+  else if (name === 'profile') await renderProfileView();
+  else if (name === 'userprofile') await renderUserProfileView();
+  else if (name === 'settings') renderSettingsView();
+  else if (name !== 'social') stopSocialPoll();
+
+  if (!options.skipScrollReset) {
+    const mc = $('#mainContent');
+    if (mc) mc.scrollTop = 0;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+  if (!options.skipSave) AppState.save();
+}
+function startSocialPoll() {
+  stopSocialPoll();
+  App._socialPollTimer = setInterval(async () => {
+    if (App.currentView !== 'social' || document.hidden || !Network.isOnline) return;
+    try { await renderFeed(true); } catch (e) {}
+  }, 15000);
+}
+function stopSocialPoll() {
+  if (App._socialPollTimer) { clearInterval(App._socialPollTimer); App._socialPollTimer = null; }
+}
+
+/* ══════════════════════════════════════════════════════════
+   Home / Movies / Anime / People
+   ══════════════════════════════════════════════════════════ */
+function renderHome() {
+  const videos = Videos.cache;
+  const heroEl = $('#heroContainer');
+  const sectionsEl = $('#homeSections');
+  if (Videos.loading) {
+    heroEl.innerHTML = '';
+    sectionsEl.innerHTML = `<div class="loader"><div class="spinner"></div><p>جاري تحميل مكتبة الأفلام...</p></div>`;
+    return;
+  }
+  if (Videos.error) {
+    heroEl.innerHTML = '';
+    sectionsEl.innerHTML = `
+      <div class="empty">
+        <svg class="icon icon-xl"><use href="#i-alert"/></svg>
+        <h3>تعذر تحميل الأفلام</h3>
+        <p>${escapeHtml(Videos.error)}</p>
+        <button class="btn primary sm" id="retryLoadBtn" style="margin-top:16px;"><svg class="icon"><use href="#i-refresh"/></svg> إعادة المحاولة</button>
+      </div>`;
+    $('#retryLoadBtn').addEventListener('click', async () => { Videos.cache = []; renderHome(); await Videos.load(true); renderHome(); });
+    return;
+  }
+  if (videos.length === 0) {
+    heroEl.innerHTML = '';
+    sectionsEl.innerHTML = `<div class="empty"><svg class="icon icon-xl"><use href="#i-film"/></svg><h3>لا توجد أفلام في المكتبة</h3><p>المكتبة فارغة حالياً</p></div>`;
+    return;
+  }
+  const hero = videos.slice().sort((a, b) => (b.rating || 0) - (a.rating || 0))[0];
+  const heroDesc = (hero.description || '');
+  const heroPoster = safeImgUrl(hero.poster);
+  heroEl.innerHTML = `
+    <div class="hero" ${heroPoster ? `style="background-image:url('${heroPoster}'); background-size:cover; background-position:center;"` : ''}>
+      <div class="hero-content">
+        <h1>${escapeHtml(hero.title)}</h1>
+        <p>${escapeHtml(heroDesc.substring(0, 180))}${heroDesc.length > 180 ? '...' : ''}</p>
+        <div class="hero-tags">
+          ${hero.year ? `<span class="hero-tag">${escapeHtml(String(hero.year))}</span>` : ''}
+          ${hero.rating ? `<span class="hero-tag">★ ${escapeHtml(String(hero.rating))}</span>` : ''}
+          ${hero.categories.slice(0, 3).map(c => `<span class="hero-tag">${escapeHtml(c)}</span>`).join('')}
+        </div>
+        <div class="hero-actions">
+          <button class="btn primary" data-play-movie="${escapeAttr(hero.id)}" type="button"><svg class="icon"><use href="#i-play"/></svg> مشاهدة الآن</button>
+          <button class="btn ghost" data-detail-movie="${escapeAttr(hero.id)}" type="button"><svg class="icon"><use href="#i-info"/></svg> التفاصيل</button>
+        </div>
+      </div>
+    </div>`;
+  const movies = Videos.getMovies();
+  const anime = Videos.getAnime();
+  const topRated = videos.slice().sort((a, b) => (b.rating || 0) - (a.rating || 0)).slice(0, 12);
+  const recent = videos.slice().sort((a, b) => (b.year || 0) - (a.year || 0)).slice(0, 12);
+  let html = '';
+  if (movies.length) html += sectionHtml('الأفلام', movies.slice(0, 12), 'movies');
+  if (anime.length) html += sectionHtml('الأنمي', anime.slice(0, 12), 'anime');
+  if (topRated.length) html += sectionHtml('الأعلى تقييماً', topRated, 'movies');
+  if (recent.length) html += sectionHtml('الأحدث', recent, 'movies');
+  sectionsEl.innerHTML = html;
+  bindMovieCards(heroEl);
+  bindMovieCards(sectionsEl);
+  const detailBtn = $('[data-detail-movie]', heroEl);
+  if (detailBtn) detailBtn.addEventListener('click', () => openDetailModal(detailBtn.dataset.detailMovie));
+  $$('.section-more', sectionsEl).forEach(btn => btn.addEventListener('click', () => showView(btn.dataset.goto)));
+}
+function sectionHtml(title, list, gotoView) {
+  return `
+    <div class="section">
+      <div class="section-head">
+        <h3 class="section-title">${escapeHtml(title)}</h3>
+        <button class="section-more" data-goto="${escapeAttr(gotoView)}" type="button">عرض الكل <svg class="icon icon-sm"><use href="#i-chev-left"/></svg></button>
+      </div>
+      <div class="row">${list.map(movieCardHtml).join('')}</div>
+    </div>`;
+}
+function movieCardHtml(movie) {
+  const safePoster = safeImgUrl(movie.poster);
+  const posterHtml = safePoster
+    ? `<img src="${safePoster}" alt="${escapeAttr(movie.title)}" loading="lazy" onerror="this.style.display='none'">`
+    : `<svg class="icon icon-xl"><use href="#i-film"/></svg>`;
+  return `
+    <div class="movie-card" data-movie-id="${escapeAttr(movie.id)}">
+      <div class="movie-poster">
+        ${posterHtml}
+        ${movie.rating ? `<span class="movie-badge gold">★ ${escapeHtml(String(movie.rating))}</span>` : ''}
+        <div class="movie-overlay">
+          <button class="movie-overlay-btn" data-play-movie="${escapeAttr(movie.id)}" title="تشغيل" type="button"><svg class="icon"><use href="#i-play"/></svg></button>
+        </div>
+      </div>
+      <div class="movie-info">
+        <div class="movie-title">${escapeHtml(movie.title)}</div>
+        <div class="movie-meta">
+          ${movie.year ? `<span>${escapeHtml(String(movie.year))}</span>` : ''}
+          ${movie.duration ? `<span>${escapeHtml(String(movie.duration))} د</span>` : ''}
+        </div>
+      </div>
+    </div>`;
+}
+function bindMovieCards(root) {
+  $$('.movie-card', root).forEach(card => {
+    card.addEventListener('click', e => { if (e.target.closest('[data-play-movie]')) return; openDetailModal(card.dataset.movieId); });
+  });
+  $$('[data-play-movie]', root).forEach(btn => {
+    btn.addEventListener('click', e => { e.stopPropagation(); playMovie(btn.dataset.playMovie); });
+  });
+}
+function renderMoviesView() {
+  if (Videos.loading) { $('#movieGrid').innerHTML = `<div class="loader" style="grid-column:1/-1;"><div class="spinner"></div><p>جاري التحميل...</p></div>`; return; }
+  renderGridWithFilter(Videos.getMovies(), '#movieGrid', '#movieChips', 'currentMovieFilter');
+}
+function renderAnimeView() {
+  if (Videos.loading) { $('#animeGrid').innerHTML = `<div class="loader" style="grid-column:1/-1;"><div class="spinner"></div><p>جاري التحميل...</p></div>`; return; }
+  renderGridWithFilter(Videos.getAnime(), '#animeGrid', '#animeChips', 'currentAnimeFilter');
+}
+function renderGridWithFilter(list, gridSel, chipsSel, filterKey) {
+  const grid = $(gridSel); const chipsEl = $(chipsSel);
+  if (!grid || !chipsEl) return;
+  if (list.length === 0) { grid.innerHTML = emptyState('لا توجد عناصر في هذا القسم'); chipsEl.innerHTML = ''; return; }
+  const categories = Videos.allCategories(list);
+  const current = App[filterKey] || 'all';
+  chipsEl.innerHTML = `<button class="chip ${current === 'all' ? 'active' : ''}" data-filter="all" type="button">الكل (${list.length})</button>` +
+    categories.map(c => {
+      const count = list.filter(m => m.categories.includes(c)).length;
+      return `<button class="chip ${current === c ? 'active' : ''}" data-filter="${escapeAttr(c)}" type="button">${escapeHtml(c)} (${count})</button>`;
+    }).join('');
+  const filtered = current === 'all' ? list : list.filter(m => m.categories.includes(current));
+  grid.innerHTML = filtered.length ? filtered.map(movieCardHtml).join('') : emptyState('لا توجد نتائج');
+  bindMovieCards(grid);
+  $$('.chip', chipsEl).forEach(chip => chip.addEventListener('click', () => {
+    App[filterKey] = chip.dataset.filter;
+    renderGridWithFilter(list, gridSel, chipsSel, filterKey);
+    AppState.save();
+  }));
+}
+function emptyState(message) {
+  return `<div class="empty" style="grid-column:1/-1;"><svg class="icon icon-xl"><use href="#i-film"/></svg><h3>${escapeHtml(message)}</h3></div>`;
+}
+function renderPeopleView() {
+  const grid = $('#peopleGrid'); if (!grid) return;
+  if (Videos.loading) { grid.innerHTML = `<div class="loader" style="grid-column:1/-1;"><div class="spinner"></div></div>`; return; }
+  const list = Videos.cache; const type = App.peopleType;
+  let items = [];
+  if (type === 'actors') items = Videos.allActors(list);
+  else if (type === 'studios') items = Videos.allStudios(list);
+  else items = Videos.allAuthors(list);
+  $$('[data-people-type]').forEach(b => b.classList.toggle('active', b.dataset.peopleType === type));
+  if (items.length === 0) { grid.innerHTML = emptyState('لا توجد بيانات في هذا القسم'); return; }
+  grid.innerHTML = items.map(person => {
+    const initial = String(person.name || '?').trim().substring(0, 1);
+    const safeImg = safeImgUrl(person.image);
+    const avatar = safeImg
+      ? `<img class="person-avatar" src="${safeImg}" alt="">`
+      : `<div class="person-avatar">${escapeHtml(initial)}</div>`;
+    return `<div class="person-card" data-person-name="${escapeAttr(person.name)}" data-person-type="${escapeAttr(type)}">${avatar}<div class="person-name">${escapeHtml(person.name)}</div><div class="person-role">${person.count} عمل</div></div>`;
+  }).join('');
+  $$('.person-card', grid).forEach(card => card.addEventListener('click', () => openPersonDetail(card.dataset.personName, card.dataset.personType)));
+}
+function openPersonDetail(name, type) {
+  const list = Videos.cache;
+  let items = [];
+  if (type === 'actors') items = list.filter(v => v.actors.some(a => a.name === name));
+  else if (type === 'studios') items = list.filter(v => v.studio === name);
+  else items = list.filter(v => v.author === name);
+  openGenericModal(`
+    <div class="modal-panel" style="max-width:720px;width:min(720px,100%);">
+      <button class="modal-close" data-modal-close="person" type="button"><svg class="icon"><use href="#i-close"/></svg></button>
+      <h3><svg class="icon"><use href="#i-users"/></svg> ${escapeHtml(name)}</h3>
+      <p class="modal-sub">${items.length} عمل</p>
+      <div class="grid wide">${items.length ? items.map(movieCardHtml).join('') : emptyState('لا توجد أعمال')}</div>
+    </div>`);
+  bindMovieCards($('#genericModal'));
+}
+
+/* ══════════════════════════════════════════════════════════
+   Movie Detail
+   ══════════════════════════════════════════════════════════ */
+function openDetailModal(movieId) {
+  const movie = Videos.findById(movieId); if (!movie) return;
+  const modal = $('#detailModal');
+  const inWatchlist = ((App.user && App.user.watchlist) || []).includes(movie.id);
+  const safePoster = safeImgUrl(movie.poster);
+  modal.innerHTML = `
+    <div class="detail-content">
+      <div class="detail-banner" ${safePoster ? `style="background-image:url('${safePoster}')"` : ''}>
+        <button class="detail-close" id="detailCloseBtn" type="button"><svg class="icon"><use href="#i-close"/></svg></button>
+      </div>
+      <div class="detail-body">
+        <div class="detail-header">
+          <div class="detail-poster">${safePoster ? `<img src="${safePoster}" alt="">` : `<svg class="icon icon-xl"><use href="#i-film"/></svg>`}</div>
+          <div class="detail-titles">
+            <h2>${escapeHtml(movie.title)}</h2>
+            <div class="detail-meta">
+              ${movie.year ? `<span><svg class="icon icon-sm"><use href="#i-calendar"/></svg> ${escapeHtml(String(movie.year))}</span>` : ''}
+              ${movie.duration ? `<span><svg class="icon icon-sm"><use href="#i-clock"/></svg> ${escapeHtml(String(movie.duration))} دقيقة</span>` : ''}
+              ${movie.rating ? `<span><svg class="icon icon-sm"><use href="#i-star"/></svg> ${escapeHtml(String(movie.rating))}</span>` : ''}
+              ${movie.isAnime ? `<span>أنمي</span>` : ''}
+            </div>
+            <div class="hero-tags">${movie.categories.map(c => `<span class="hero-tag" style="background:var(--surface-2);color:var(--text);">${escapeHtml(c)}</span>`).join('')}</div>
+            <div class="hero-actions" style="margin-top:14px;">
+              <button class="btn primary" data-play-movie="${escapeAttr(movie.id)}" type="button"><svg class="icon"><use href="#i-play"/></svg> مشاهدة</button>
+              <button class="btn ghost" id="watchlistBtn" type="button"><svg class="icon"><use href="#i-bookmark"/></svg> ${inWatchlist ? 'إزالة من قائمتي' : 'أضف لقائمتي'}</button>
+            </div>
+          </div>
+        </div>
+        ${movie.description ? `<p class="detail-desc">${escapeHtml(movie.description)}</p>` : ''}
+        ${movie.actors.length || movie.studio || movie.author ? `
+          <div class="detail-info-grid">
+            ${movie.studio ? `<div class="detail-info-item"><div class="label">الاستوديو</div><div class="value">${escapeHtml(movie.studio)}</div></div>` : ''}
+            ${movie.author ? `<div class="detail-info-item"><div class="label">المؤلف / المخرج</div><div class="value">${escapeHtml(movie.author)}</div></div>` : ''}
+            ${movie.actors.length ? `<div class="detail-info-item"><div class="label">الممثلون</div><div class="value">${movie.actors.map(a => escapeHtml(a.name)).join(' · ')}</div></div>` : ''}
+          </div>` : ''}
+      </div>
+    </div>`;
+  modal.classList.add('active'); document.body.classList.add('no-scroll');
+  const closeFn = () => { modal.classList.remove('active'); document.body.classList.remove('no-scroll'); };
+  if (modal._backdropHandler) modal.removeEventListener('click', modal._backdropHandler);
+  modal._backdropHandler = (e) => { if (e.target === modal) closeFn(); };
+  modal.addEventListener('click', modal._backdropHandler);
+  $('#detailCloseBtn').addEventListener('click', closeFn);
+  $$('[data-play-movie]', modal).forEach(b => b.addEventListener('click', () => { closeFn(); playMovie(b.dataset.playMovie); }));
+  $('#watchlistBtn').addEventListener('click', async () => {
+    if (!App.user.watchlist) App.user.watchlist = [];
+    const idx = App.user.watchlist.indexOf(movie.id);
+    if (idx === -1) App.user.watchlist.push(movie.id); else App.user.watchlist.splice(idx, 1);
+    try { App.user = await Auth.updateUser(App.user.id, { watchlist: App.user.watchlist }); } catch (err) { toast(err.message, 'error'); }
+    toast(idx === -1 ? 'أضيف لقائمتك' : 'أزيل من قائمتك', 'success');
+    openDetailModal(movieId);
+  });
+}
+
+function renderWatchlistView() {
+  const el = $('#watchlistContent');
+  const ids = (App.user && App.user.watchlist) || [];
+  const items = ids.map(id => Videos.findById(id)).filter(Boolean);
+  if (items.length === 0) { el.innerHTML = `<div class="empty"><svg class="icon icon-xl"><use href="#i-bookmark"/></svg><h3>قائمتك فارغة</h3><p>أضف أفلاماً لمشاهدتها لاحقاً</p></div>`; return; }
+  el.innerHTML = `<div class="grid wide">${items.map(movieCardHtml).join('')}</div>`;
+  bindMovieCards(el);
+}
+
+/* ══════════════════════════════════════════════════════════
+   Social UI
+   ══════════════════════════════════════════════════════════ */
+async function renderSocialView() { await renderFeed(); }
+async function renderFeed(silent = false) {
+  const el = $('#socialFeed'); if (!el) return;
+  if (!silent) el.innerHTML = `<div class="loader"><div class="spinner"></div><p>جاري تحميل المنشورات...</p></div>`;
+  try {
+    const followingIds = await Social.getFollowing(App.user.id);
+    const followingSet = new Set(followingIds);
+    let posts = await Social.getPosts();
+    if (App.currentHashtag) {
+      const re = new RegExp('#' + App.currentHashtag.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b', 'i');
+      posts = posts.filter(p => re.test(p.text || ''));
+    }
+    posts.sort((a, b) => {
+      const aFollow = (followingSet.has(a.userId) || a.userId === App.user.id) ? 1 : 0;
+      const bFollow = (followingSet.has(b.userId) || b.userId === App.user.id) ? 1 : 0;
+      if (aFollow !== bFollow) return bFollow - aFollow;
+      return trendingScore(b) - trendingScore(a);
+    });
+    const hash = posts.map(p => p.id + ':' + (p.likes?.length || 0) + ':' + (p.comments?.length || 0)).join('|');
+    if (silent && hash === App._socialLastHash) return;
+    App._socialLastHash = hash;
+    let header = '';
+    if (App.currentHashtag) {
+      header = `<div style="margin-bottom:12px;padding:12px 16px;background:var(--surface);border:2px solid var(--primary);border-radius:var(--radius);display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;">
+        <span>عرض منشورات <strong style="color:var(--primary);">#${escapeHtml(App.currentHashtag)}</strong> (${posts.length})</span>
+        <button class="btn ghost sm" id="clearHashtagBtn" type="button">مسح الفلتر</button>
+      </div>`;
+    }
+    if (posts.length === 0) {
+      el.innerHTML = header + `<div class="empty"><svg class="icon icon-xl"><use href="#i-comment"/></svg><h3>لا توجد منشورات</h3><p>${App.currentHashtag ? 'لا توجد منشورات بهذا الهاشتاق' : 'كن أول من يشارك رأيه!'}</p></div>`;
+    } else {
+      el.innerHTML = header + posts.map(p => postHtml(p, followingSet)).join('');
+      bindPostEvents(el);
+    }
+    const clearBtn = $('#clearHashtagBtn');
+    if (clearBtn) clearBtn.addEventListener('click', () => { App.currentHashtag = null; renderFeed(); AppState.save(); });
+  } catch (err) {
+    if (!silent) el.innerHTML = `<div class="empty"><svg class="icon icon-xl"><use href="#i-alert"/></svg><h3>تعذر تحميل المنشورات</h3><p>${escapeHtml(err.message)}</p></div>`;
+  }
+}
+
+async function renderMyPosts() {
+  const el = $('#myPostsFeed'); if (!el || !App.user) return;
+  el.innerHTML = `<div class="loader"><div class="spinner"></div></div>`;
+  try {
+    const posts = await Social.getUserPosts(App.user.id);
+    if (!posts.length) {
+      el.innerHTML = `<div class="empty"><svg class="icon icon-xl"><use href="#i-comment"/></svg><h3>لا منشورات بعد</h3><p>شارك أول منشور من صفحة المجتمع</p></div>`;
+      return;
+    }
+    el.innerHTML = posts.map(p => postHtml(p, new Set())).join('');
+    bindPostEvents(el);
+  } catch (err) {
+    el.innerHTML = `<div class="empty"><p>${escapeHtml(err.message)}</p></div>`;
+  }
+}
+
+function postHtml(post, followingSet) {
+  const liked = post.likes.includes(App.user.id);
+  const isMine = post.userId === App.user.id;
+  const isFollowing = !isMine && followingSet && followingSet.has(post.userId);
+  const user = { username: post.username, avatar: post.avatar };
+  const followBtn = isMine ? '' : `
+    <button class="post-action ${isFollowing ? 'liked' : ''}" data-follow-user="${escapeAttr(post.userId)}" type="button" title="${isFollowing ? 'إلغاء المتابعة' : 'متابعة'}">
+      <svg class="icon icon-sm"><use href="#${isFollowing ? 'i-user-check' : 'i-user-plus'}"/></svg>
+      <span>${isFollowing ? 'متابَع' : 'متابعة'}</span>
+    </button>`;
+  const safePostImage = safeImgUrl(post.image);
+  const imageHtml = safePostImage ? `<img class="post-image" src="${safePostImage}" alt="" data-preview-img="${escapeAttr(safePostImage)}">` : '';
+  const commentsHtml = buildCommentsTree(post.comments);
+  return `
+    <article class="post" data-post-id="${escapeAttr(post.id)}">
+      <div class="post-header">
+        ${avatarHtml(user, 'sm', true)}
+        <div class="post-info">
+          <div class="post-name" data-user-avatar="${escapeAttr(post.username)}">${escapeHtml(post.username)}</div>
+          <div class="post-username">${timeAgo(post.createdAt)}</div>
+        </div>
+        ${isMine ? `<button class="icon-btn" style="width:34px;height:34px;background:transparent;border:none;" data-delete-post="${escapeAttr(post.id)}" title="حذف" type="button"><svg class="icon icon-sm"><use href="#i-trash"/></svg></button>` : ''}
+      </div>
+      ${post.text ? `<div class="post-content">${formatText(post.text)}</div>` : ''}
+      ${imageHtml}
+      <div class="post-actions">
+        <button class="post-action ${liked ? 'liked' : ''}" data-like-post="${escapeAttr(post.id)}" type="button">
+          <svg class="icon icon-sm"><use href="#i-heart"/></svg><span>${post.likes.length}</span>
+        </button>
+        <button class="post-action" data-comment-toggle="${escapeAttr(post.id)}" type="button">
+          <svg class="icon icon-sm"><use href="#i-comment"/></svg><span>${post.comments.length}</span>
+        </button>
+        ${followBtn}
+      </div>
+      <div class="post-comments" data-comments-section="${escapeAttr(post.id)}">
+        <div data-comments-list="${escapeAttr(post.id)}">${commentsHtml}</div>
+        <div class="comment-input" style="margin-top:8px;">
+          <input type="text" placeholder="اكتب تعليقاً..." data-comment-input="${escapeAttr(post.id)}" data-parent-id="" maxlength="300">
+          <button class="btn primary sm" data-comment-send="${escapeAttr(post.id)}" type="button">إرسال</button>
+        </div>
+      </div>
+    </article>`;
+}
+
+function buildCommentsTree(comments) {
+  const top = comments.filter(c => !c.parentId).sort((a, b) => {
+    const la = (a.likes || []).length, lb = (b.likes || []).length;
+    if (lb !== la) return lb - la;
+    return b.createdAt - a.createdAt;
+  });
+  return top.map(c => renderCommentTree(c, comments)).join('');
+}
+function renderCommentTree(comment, allComments) {
+  const replies = allComments.filter(c => c.parentId === comment.id).sort((a, b) => {
+    const la = (a.likes || []).length, lb = (b.likes || []).length;
+    if (lb !== la) return lb - la;
+    return a.createdAt - b.createdAt;
+  });
+  const repliesHtml = replies.length ? `<div class="comment-replies">${replies.map(r => renderCommentTree(r, allComments)).join('')}</div>` : '';
+  return commentHtml(comment) + repliesHtml;
+}
+function commentHtml(comment) {
+  const isMine = comment.userId === App.user.id;
+  const liked = (comment.likes || []).includes(App.user.id);
+  const likeCount = (comment.likes || []).length;
+  return `
+    <div class="comment" data-comment-id="${escapeAttr(comment.id)}" data-comment-owner="${escapeAttr(comment.userId)}">
+      ${avatarHtml({ username: comment.username, avatar: comment.avatar }, 'md', true)}
+      <div class="comment-body">
+        <div class="comment-name" data-user-avatar="${escapeAttr(comment.username)}">${escapeHtml(comment.username)} <span class="tiny">${timeAgo(comment.createdAt)}</span></div>
+        <div class="comment-text">${formatText(comment.text)}</div>
+        <div class="comment-actions">
+          <button class="${liked ? 'liked' : ''}" data-like-comment="${escapeAttr(comment.id)}" type="button">
+            <svg class="icon icon-sm"><use href="#i-heart"/></svg> ${likeCount}
+          </button>
+          <button data-reply-comment="${escapeAttr(comment.id)}" type="button">
+            <svg class="icon icon-sm"><use href="#i-reply"/></svg> رد
+          </button>
+          ${isMine ? `<button data-delete-comment="${escapeAttr(comment.id)}" type="button">حذف</button>` : ''}
+        </div>
+        <div class="reply-input-box" data-reply-box="${escapeAttr(comment.id)}">
+          <input type="text" placeholder="اكتب رداً..." data-reply-input="${escapeAttr(comment.id)}" maxlength="300">
+          <button class="btn primary sm" data-reply-send="${escapeAttr(comment.id)}" type="button">إرسال</button>
+        </div>
+      </div>
+    </div>`;
+}
+
+function bindPostEvents(root) {
+  if (!root) return;
+  // Avatar / name clicks -> open user profile page
+  $$('[data-user-avatar]', root).forEach(el => {
+    if (el._userBound) return;
+    el._userBound = true;
+    el.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const username = el.dataset.userAvatar;
+      if (username) showUserProfilePage(username);
+    });
+  });
+  $$('[data-preview-img]', root).forEach(img => {
+    if (img._previewBound) return;
+    img._previewBound = true;
+    img.addEventListener('click', () => openImagePreview(img.dataset.previewImg));
+  });
+  $$('[data-like-post]', root).forEach(btn => {
+    if (btn._likeBound) return;
+    btn._likeBound = true;
+    btn.addEventListener('click', async () => {
+      btn.disabled = true;
+      try {
+        const { liked, count } = await Social.toggleLike(btn.dataset.likePost, App.user.id);
+        btn.classList.toggle('liked', liked);
+        const span = btn.querySelector('span'); if (span) span.textContent = count;
+        App._socialLastHash = '';
+      } catch (err) { toast(err.message, 'error'); }
+      finally { btn.disabled = false; }
+    });
+  });
+  $$('[data-comment-toggle]', root).forEach(btn => {
+    if (btn._toggleBound) return;
+    btn._toggleBound = true;
+    btn.addEventListener('click', () => {
+      const section = root.querySelector(`[data-comments-section="${CSS.escape(btn.dataset.commentToggle)}"]`);
+      if (section) section.classList.toggle('open');
+    });
+  });
+  $$('[data-comment-send]', root).forEach(btn => {
+    if (btn._sendBound) return;
+    btn._sendBound = true;
+    btn.addEventListener('click', async () => {
+      const pid = btn.dataset.commentSend;
+      const input = root.querySelector(`[data-comment-input="${CSS.escape(pid)}"]`);
+      if (!input || !input.value.trim()) return;
+      btn.disabled = true;
+      try {
+        const c = await Social.addComment(pid, App.user, input.value, null);
+        const list = root.querySelector(`[data-comments-list="${CSS.escape(pid)}"]`);
+        if (list) {
+          list.insertAdjacentHTML('afterbegin', commentHtml(c) + `<div class="comment-replies" data-replies-for="${escapeAttr(c.id)}"></div>`);
+          const newOwner = list.querySelector(`[data-comment-owner="${CSS.escape(App.user.id)}"]`);
+          if (newOwner) bindCommentActions(newOwner, pid, root);
+        }
+        const countSpan = root.querySelector(`[data-comment-toggle="${CSS.escape(pid)}"] span`);
+        if (countSpan) countSpan.textContent = (parseInt(countSpan.textContent) || 0) + 1;
+        root.querySelector(`[data-comments-section="${CSS.escape(pid)}"]`)?.classList.add('open');
+        input.value = '';
+        App._socialLastHash = '';
+      } catch (err) { toast(err.message, 'error'); }
+      finally { btn.disabled = false; }
+    });
+  });
+  $$('[data-comment-input]', root).forEach(inp => {
+    if (inp._keyBound) return;
+    inp._keyBound = true;
+    inp.addEventListener('keydown', e => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        const sendBtn = root.querySelector(`[data-comment-send="${CSS.escape(inp.dataset.commentInput)}"]`);
+        if (sendBtn) sendBtn.click();
+      }
+    });
+  });
+  $$('[data-delete-post]', root).forEach(btn => {
+    if (btn._delBound) return;
+    btn._delBound = true;
+    btn.addEventListener('click', async () => {
+      if (!confirm('حذف المنشور؟')) return;
+      try {
+        await Social.deletePost(btn.dataset.deletePost, App.user.id);
+        root.querySelector(`.post[data-post-id="${CSS.escape(btn.dataset.deletePost)}"]`)?.remove();
+        toast('تم الحذف', 'success');
+        App._socialLastHash = '';
+      } catch (err) { toast(err.message, 'error'); }
+    });
+  });
+  $$('[data-follow-user]', root).forEach(btn => {
+    if (btn._followBound) return;
+    btn._followBound = true;
+    btn.addEventListener('click', async () => {
+      btn.disabled = true;
+      try {
+        const following = await Social.toggleFollow(App.user.id, btn.dataset.followUser);
+        btn.classList.toggle('liked', following);
+        const span = btn.querySelector('span'); if (span) span.textContent = following ? 'متابَع' : 'متابعة';
+        const use = btn.querySelector('use'); if (use) use.setAttribute('href', following ? '#i-user-check' : '#i-user-plus');
+        toast(following ? 'تمت المتابعة' : 'تم إلغاء المتابعة', 'success');
+      } catch (err) { toast(err.message, 'error'); }
+      finally { btn.disabled = false; }
+    });
+  });
+  $$('.comment', root).forEach(c => {
+    const postEl = c.closest('.post');
+    if (postEl) bindCommentActions(c, postEl.dataset.postId, root);
+  });
+}
+
+function bindCommentActions(commentEl, postId, root) {
+  const commentId = commentEl.dataset.commentId;
+  const likeBtn = commentEl.querySelector('[data-like-comment]');
+  if (likeBtn && !likeBtn._bound) {
+    likeBtn._bound = true;
+    likeBtn.addEventListener('click', async () => {
+      likeBtn.disabled = true;
+      try {
+        const { liked, count } = await Social.toggleCommentLike(postId, commentId, App.user.id);
+        likeBtn.classList.toggle('liked', liked);
+        likeBtn.innerHTML = `<svg class="icon icon-sm"><use href="#i-heart"/></svg> ${count}`;
+        App._socialLastHash = '';
+      } catch (err) { toast(err.message, 'error'); }
+      finally { likeBtn.disabled = false; }
+    });
+  }
+  const replyBtn = commentEl.querySelector('[data-reply-comment]');
+  const replyBox = commentEl.querySelector('[data-reply-box]');
+  if (replyBtn && !replyBtn._bound) {
+    replyBtn._bound = true;
+    replyBtn.addEventListener('click', () => { if (replyBox) replyBox.classList.toggle('open'); });
+  }
+  const replySend = commentEl.querySelector('[data-reply-send]');
+  if (replySend && !replySend._bound) {
+    replySend._bound = true;
+    replySend.addEventListener('click', async () => {
+      const inp = commentEl.querySelector('[data-reply-input]');
+      if (!inp || !inp.value.trim()) return;
+      replySend.disabled = true;
+      try {
+        const c = await Social.addComment(postId, App.user, inp.value, commentId);
+        let container = commentEl.nextElementSibling;
+        if (!container || !container.classList.contains('comment-replies')) {
+          container = document.createElement('div');
+          container.className = 'comment-replies';
+          commentEl.parentNode.insertBefore(container, commentEl.nextSibling);
+        }
+        container.insertAdjacentHTML('beforeend', commentHtml(c));
+        const newEl = container.lastElementChild;
+        bindCommentActions(newEl, postId, root);
+        const countSpan = root.querySelector(`[data-comment-toggle="${CSS.escape(postId)}"] span`);
+        if (countSpan) countSpan.textContent = (parseInt(countSpan.textContent) || 0) + 1;
+        inp.value = '';
+        replyBox?.classList.remove('open');
+        App._socialLastHash = '';
+      } catch (err) { toast(err.message, 'error'); }
+      finally { replySend.disabled = false; }
+    });
+  }
+  const delBtn = commentEl.querySelector('[data-delete-comment]');
+  if (delBtn && !delBtn._bound) {
+    delBtn._bound = true;
+    delBtn.addEventListener('click', async () => {
+      if (!confirm('حذف التعليق وكل ردوده؟')) return;
+      try {
+        await Social.deleteComment(postId, commentId, App.user.id);
+        if (App.currentView === 'userprofile') await renderUserProfileView();
+        else await renderFeed();
+        toast('تم الحذف', 'success');
+      } catch (err) { toast(err.message, 'error'); }
+    });
+  }
+}
+
+function openImagePreview(src) {
+  const safe = safeImgUrl(src);
+  if (!safe) return;
+  openGenericModal(`
+    <div style="position:relative;max-width:90vw;max-height:90vh;">
+      <button class="modal-close" data-modal-close="image" type="button" style="top:-46px;left:0;"><svg class="icon"><use href="#i-close"/></svg></button>
+      <img src="${safe}" style="max-width:90vw;max-height:85vh;border-radius:12px;object-fit:contain;">
+    </div>`);
+}
+
+function filterByHashtag(tag) {
+  const safe = sanitizeText(tag, 80).replace(/[^a-zA-Z0-9_\u0600-\u06FF]/g, '');
+  if (!safe) return;
+  App.currentHashtag = safe;
+  if (App.currentView !== 'social') showView('social');
+  else renderFeed();
+  AppState.save();
+}
+
+/* ══════════════════════════════════════════════════════════
+   Full-page user profile (for clicking other users)
+   ══════════════════════════════════════════════════════════ */
+async function showUserProfilePage(username) {
+  if (!username) return;
+  // If it's the current user, go to their own profile view
+  if (App.user && username.toLowerCase() === (App.user.username || '').toLowerCase()) {
+    App.previousView = App.currentView;
+    await showView('profile');
+    return;
+  }
+  if (App.currentView !== 'userprofile') {
+    App.previousView = App.currentView;
+  }
+  App.currentUserProfile = null;
+  App.currentUserProfileStats = null;
+  App.currentUserProfileUsername = username;
+  await showView('userprofile');
+}
+
+async function renderUserProfileView() {
+  const el = $('#userProfileContent');
+  if (!el) return;
+  // Fetch profile if not loaded or different user
+  const profile = App.currentUserProfile;
+  if (!profile) {
+    el.innerHTML = `<div class="loader"><div class="spinner"></div><p>جاري تحميل الملف...</p></div>`;
+    const fetched = await Social.getProfileByUsername(App.currentUserProfileUsername);
+    if (!fetched) {
+      el.innerHTML = `<div class="empty"><svg class="icon icon-xl"><use href="#i-alert"/></svg><h3>المستخدم غير موجود</h3></div>`;
+      return;
+    }
+    App.currentUserProfile = fetched;
+  }
+  const p = App.currentUserProfile;
+  const isSelf = p.id === App.user.id;
+  if (isSelf) { App.currentUserProfile = null; return showView('profile'); }
+
+  el.innerHTML = `<div class="loader"><div class="spinner"></div></div>`;
+
+  let counts = { followers: 0, following: 0 };
+  let isFollowing = false;
+  let posts = [];
+  try {
+    const [c, followingList, userPosts] = await Promise.all([
+      Social.getFollowCounts(p.id),
+      Social.getFollowing(App.user.id),
+      Social.getUserPosts(p.id)
+    ]);
+    counts = c;
+    isFollowing = followingList.includes(p.id);
+    posts = userPosts;
+  } catch (e) {}
+
+  const safeBanner = safeImgUrl(getBannerForUser(null, p));
+  const safeAvatar = safeImgUrl(p.avatar_url);
+  const memberSince = p.created_at ? new Date(p.created_at).toLocaleDateString('ar') : '—';
+  const bannerStyle = safeBanner ? `background-image:url('${safeBanner}');` : '';
+  const avatarStyle = safeAvatar ? `background-image:url('${safeAvatar}');` : '';
+
+  el.innerHTML = `
+    <div class="profile-banner-wrap">
+      <div class="profile-banner" style="${bannerStyle}"></div>
+    </div>
+    <div class="profile-header">
+      <div class="profile-pic-wrap">
+        <div class="profile-pic" style="${avatarStyle}">${!safeAvatar ? escapeHtml(userInitials(p.username)) : ''}</div>
+      </div>
+      <div class="profile-meta">
+        <h3>${escapeHtml(p.username)}</h3>
+        <p>${escapeHtml(p.bio || 'لا توجد نبذة')}</p>
+        <p class="tiny">عضو منذ ${escapeHtml(memberSince)}</p>
+        <p class="tiny" style="margin-top:6px;">${posts.length} منشور · ${counts.followers} متابع · ${counts.following} يتابع</p>
+      </div>
+      <div class="profile-actions">
+        <button class="btn ${isFollowing ? 'ghost' : 'primary'}" id="userFollowBtn" type="button">
+          <svg class="icon icon-sm"><use href="#${isFollowing ? 'i-user-check' : 'i-user-plus'}"/></svg>
+          ${isFollowing ? 'إلغاء المتابعة' : 'متابعة'}
+        </button>
+      </div>
+    </div>
+    <h3 style="font-weight:800;margin:20px 0 12px;display:flex;align-items:center;gap:8px;"><svg class="icon"><use href="#i-comment"/></svg> المنشورات</h3>
+    <div id="userProfilePosts"></div>
+  `;
+
+  const postsEl = $('#userProfilePosts');
+  if (posts.length === 0) {
+    postsEl.innerHTML = `<div class="empty"><svg class="icon icon-xl"><use href="#i-comment"/></svg><h3>لا منشورات</h3><p>لم يشارك هذا المستخدم أي منشور بعد</p></div>`;
+  } else {
+    postsEl.innerHTML = posts.map(post => postHtml(post, new Set())).join('');
+    bindPostEvents(postsEl);
+  }
+
+  $('#userFollowBtn')?.addEventListener('click', async () => {
+    const btn = $('#userFollowBtn');
+    btn.disabled = true;
+    try {
+      const now = await Social.toggleFollow(App.user.id, p.id);
+      btn.className = 'btn ' + (now ? 'ghost' : 'primary');
+      btn.innerHTML = `<svg class="icon icon-sm"><use href="#${now ? 'i-user-check' : 'i-user-plus'}"/></svg> ${now ? 'إلغاء المتابعة' : 'متابعة'}`;
+      toast(now ? 'تمت المتابعة' : 'تم إلغاء المتابعة', 'success');
+      // update counts
+      const newCounts = await Social.getFollowCounts(p.id);
+      const pEl = el.querySelector('.profile-meta .tiny:last-child');
+      if (pEl) pEl.textContent = `${posts.length} منشور · ${newCounts.followers} متابع · ${newCounts.following} يتابع`;
+    } catch (err) { toast(err.message, 'error'); }
+    finally { btn.disabled = false; }
+  });
+}
+
+async function goBackFromUserProfile() {
+  const prev = App.previousView || 'social';
+  App.previousView = null;
+  App.currentUserProfile = null;
+  App.currentUserProfileUsername = null;
+  await showView(prev);
+}
+
+async function showFollowList(userId, type) {
+  const profiles = type === 'followers'
+    ? await Social.getFollowersProfiles(userId)
+    : await Social.getFollowingProfiles(userId);
+  openGenericModal(`
+    <div class="modal-panel" style="max-width:480px;">
+      <button class="modal-close" data-modal-close="list" type="button"><svg class="icon"><use href="#i-close"/></svg></button>
+      <h3><svg class="icon"><use href="#i-users"/></svg> ${type === 'followers' ? 'المتابعون' : 'يتابع'}</h3>
+      <p class="modal-sub">${profiles.length} مستخدم</p>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        ${profiles.length === 0 ? `<div class="empty"><svg class="icon icon-xl"><use href="#i-users"/></svg><h3>لا يوجد أحد</h3></div>` : profiles.map(p => `
+          <div style="display:flex;align-items:center;gap:12px;padding:10px;background:var(--surface-2);border-radius:10px;cursor:pointer;" data-user-profile="${escapeAttr(p.username)}">
+            ${safeImgUrl(p.avatar_url) ? `<img src="${safeImgUrl(p.avatar_url)}" style="width:44px;height:44px;border-radius:50%;object-fit:cover;">` : `<div style="width:44px;height:44px;border-radius:50%;background:var(--surface-3);display:flex;align-items:center;justify-content:center;font-weight:700;">${escapeHtml(userInitials(p.username))}</div>`}
+            <div><strong>${escapeHtml(p.username)}</strong></div>
+          </div>`).join('')}
+      </div>
+    </div>`);
+  $$('[data-user-profile]', $('#genericModal')).forEach(el => {
+    el.addEventListener('click', () => { closeGenericModal(); showUserProfilePage(el.dataset.userProfile); });
+  });
+}
+
+/* ══════════════════════════════════════════════════════════
+   Settings / Profile
+   ══════════════════════════════════════════════════════════ */
+function renderSettingsView() {
+  if (!App.settings) return;
+  const f = $('#stFont'); if (f) f.value = App.settings.font;
+  const r = $('#stSkipRange'); if (r) r.value = App.settings.skipSeconds;
+  const v = $('#stSkipValue');
+  if (v) v.textContent = App.settings.skipSeconds + ' ثوانٍ' + (App.settings.skipSeconds === 10 ? ' (الافتراضي)' : '');
+  syncThemeToggle();
+  updateUsernameStatus();
+}
+async function renderProfileView() {
+  await refreshUserUI();
+  await renderMyPosts();
+}
+
+function setupSettingsEvents() {
+  const stTheme = $('#stTheme'); if (stTheme) stTheme.addEventListener('click', toggleTheme);
+  const stFont = $('#stFont');
+  if (stFont) stFont.addEventListener('change', e => {
+    const font = e.target.value; applyFont(font);
+    App.settings = Settings.save(App.user.id, { font });
+    toast('تم تغيير الخط', 'success');
+  });
+  const range = $('#stSkipRange');
+  if (range) {
+    range.addEventListener('input', e => {
+      const val = parseInt(e.target.value, 10) || 10;
+      const v = $('#stSkipValue'); if (v) v.textContent = val + ' ثوانٍ' + (val === 10 ? ' (الافتراضي)' : '');
+    });
+    range.addEventListener('change', e => {
+      const val = parseInt(e.target.value, 10) || 10;
+      App.settings = Settings.save(App.user.id, { skipSeconds: val });
+      toast('تم حفظ المدة: ' + val + ' ثوانٍ', 'success');
+    });
+  }
+  const chUser = $('#stChangeUsernameBtn');
+  if (chUser) chUser.addEventListener('click', async () => {
+    const newName = $('#stNewUsername').value.trim();
+    if (!newName) { toast('أدخل اسم المستخدم الجديد', 'error'); return; }
+    try {
+      await Auth.changeUsername(App.user.id, newName);
+      App.user = await Auth.updateUser(App.user.id, {});
+      App._profileStatsCache = null;
+      await refreshUserUI();
+      toast('تم تغيير اسم المستخدم', 'success');
+      $('#stNewUsername').value = '';
+    } catch (err) { toast(err.message, 'error'); }
+  });
+  const chPass = $('#stChangePasswordBtn');
+  if (chPass) chPass.addEventListener('click', openChangePasswordModal);
+  const chAvatar = $('#stChangeAvatarBtn');
+  if (chAvatar) chAvatar.addEventListener('click', () => $('#profileAvatarInput').click());
+}
+
+function openChangePasswordModal() {
+  if (USE_SUPABASE) {
+    openGenericModal(`
+      <div class="modal-panel">
+        <button class="modal-close" data-modal-close="chpass" type="button"><svg class="icon"><use href="#i-close"/></svg></button>
+        <h3><svg class="icon"><use href="#i-key"/></svg> تغيير كلمة المرور</h3>
+        <p class="modal-sub">أدخل كلمة المرور الجديدة</p>
+        <input id="chpassNewPass" class="field" type="password" placeholder="كلمة المرور الجديدة">
+        <input id="chpassNewPassConfirm" class="field" type="password" placeholder="تأكيد كلمة المرور">
+        <p id="chpassErr3" class="err"></p>
+        <button class="btn primary block" id="chpassSaveBtn" type="button">حفظ</button>
+      </div>`);
+    $('#chpassSaveBtn').addEventListener('click', async () => {
+      const pass = $('#chpassNewPass').value;
+      const confirm = $('#chpassNewPassConfirm').value;
+      const err = $('#chpassErr3'); err.textContent = '';
+      if (pass !== confirm) { err.textContent = 'كلمتا المرور غير متطابقتين'; return; }
+      if (pass.length < 6) { err.textContent = 'كلمة المرور قصيرة (6 أحرف على الأقل)'; return; }
+      try {
+        const { error } = await supabaseClient.auth.updateUser({ password: pass });
+        if (error) throw new Error(error.message);
+        toast('تم تحديث كلمة المرور', 'success');
+        closeGenericModal();
+      } catch (e) { err.textContent = e.message; }
+    });
+    return;
+  }
+  openGenericModal(`
+    <div class="modal-panel">
+      <button class="modal-close" data-modal-close="chpass" type="button"><svg class="icon"><use href="#i-close"/></svg></button>
+      <h3><svg class="icon"><use href="#i-key"/></svg> تغيير كلمة المرور</h3>
+      <p class="modal-sub">سيتم إرسال رمز تحقق إلى <strong>${escapeHtml(App.user.email)}</strong></p>
+      <div id="chpassStep1"><button class="btn primary block" id="chpassSendBtn" type="button">إرسال الرمز</button><p id="chpassErr1" class="err"></p></div>
+      <div id="chpassStep2" style="display:none;">
+        <div class="email-code-box"><div class="label"><svg class="icon icon-sm"><use href="#i-mail"/></svg> رمز التحقق (محاكاة)</div><div class="email-code" id="chpassCodeDisplay">------</div></div>
+        <input id="chpassCodeInput" class="field" placeholder="أدخل الرمز" maxlength="6" style="text-align:center;font-family:monospace;font-size:20px;letter-spacing:6px;">
+        <p id="chpassErr2" class="err"></p>
+        <button class="btn primary block" id="chpassVerifyBtn" type="button">تحقق</button>
+      </div>
+      <div id="chpassStep3" style="display:none;">
+        <input id="chpassNewPass" class="field" type="password" placeholder="كلمة المرور الجديدة">
+        <input id="chpassNewPassConfirm" class="field" type="password" placeholder="تأكيد كلمة المرور">
+        <p id="chpassErr3" class="err"></p>
+        <button class="btn primary block" id="chpassSaveBtn" type="button">حفظ</button>
+      </div>
+    </div>`);
+  let verifiedCode = '';
+  $('#chpassSendBtn').addEventListener('click', async () => {
+    try {
+      const code = await Auth.requestResetCode(App.user.email);
+      $('#chpassCodeDisplay').textContent = code;
+      $('#chpassStep1').style.display = 'none';
+      $('#chpassStep2').style.display = 'block';
+    } catch (err) { $('#chpassErr1').textContent = err.message; }
+  });
+  $('#chpassVerifyBtn').addEventListener('click', async () => {
+    const code = $('#chpassCodeInput').value.trim();
+    try { await Auth.verifyResetCode(App.user.email, code); verifiedCode = code; $('#chpassStep2').style.display = 'none'; $('#chpassStep3').style.display = 'block'; }
+    catch (err) { $('#chpassErr2').textContent = err.message; }
+  });
+  $('#chpassSaveBtn').addEventListener('click', async () => {
+    const pass = $('#chpassNewPass').value; const confirm = $('#chpassNewPassConfirm').value;
+    if (pass !== confirm) { $('#chpassErr3').textContent = 'كلمتا المرور غير متطابقتين'; return; }
+    try { await Auth.resetPassword(App.user.email, verifiedCode, pass); toast('تم تحديث كلمة المرور', 'success'); closeGenericModal(); }
+    catch (err) { $('#chpassErr3').textContent = err.message; }
+  });
+}
+
+function openGenericModal(html) {
+  const modal = $('#genericModal');
+  modal.innerHTML = html;
+  modal.classList.add('active');
+  document.body.classList.add('no-scroll');
+  $$('[data-modal-close]', modal).forEach(btn => btn.addEventListener('click', closeGenericModal));
+  if (modal._backdropHandler) modal.removeEventListener('click', modal._backdropHandler);
+  modal._backdropHandler = (e) => { if (e.target === modal) closeGenericModal(); };
+  modal.addEventListener('click', modal._backdropHandler);
+}
+function closeGenericModal() {
+  const modal = $('#genericModal');
+  modal.classList.remove('active');
+  modal.innerHTML = '';
+  document.body.classList.remove('no-scroll');
+}
+
+/* ══════════════════════════════════════════════════════════
+   Player
+   ══════════════════════════════════════════════════════════ */
+const Player = {
+  video: null, currentMovie: null, hideControlsTimer: null, skipIntroTimer: null, _lastTapTime: 0, _tapTimer: null,
+  init() { if (this.video) return; this.video = $('#playerVideo'); this.bindControls(); },
+  bindControls() {
+    const v = this.video;
+    const stage = $('#playerStage');
+    $('#playerBigPlay').addEventListener('click', () => this.togglePlay());
+    $('#playPauseBtn').addEventListener('click', () => this.togglePlay());
+    $('#playerCloseBtn').addEventListener('click', () => this.close());
+    $('#skipBackBtn').addEventListener('click', () => { const sec = App.settings?.skipSeconds || 10; v.currentTime = Math.max(0, v.currentTime - sec); });
+    $('#skipFwdBtn').addEventListener('click', () => { const sec = App.settings?.skipSeconds || 10; v.currentTime = Math.min(v.duration || 0, v.currentTime + sec); });
+    const progressBar = $('#progressBar');
+    progressBar.addEventListener('click', e => {
+      const rect = progressBar.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const pct = Math.max(0, Math.min(1, x / rect.width));
+      if (v.duration) v.currentTime = pct * v.duration;
+    });
+    $('#volumeBtn').addEventListener('click', () => { v.muted = !v.muted; this.updateVolumeIcon(); });
+    $('#volumeSlider').addEventListener('input', e => { v.volume = parseFloat(e.target.value); v.muted = v.volume === 0; this.updateVolumeIcon(); });
+    $('#fullscreenBtn').addEventListener('click', async () => {
+      const modal = $('#playerModal');
+      if (document.fullscreenElement || document.webkitFullscreenElement) {
+        try { await document.exitFullscreen?.(); } catch (e) {}
+        try { await document.webkitExitFullscreen?.(); } catch (e) {}
+        try { screen.orientation?.unlock?.(); } catch (e) {}
+        stage.classList.remove('force-landscape');
+      } else {
+        try {
+          if (modal.requestFullscreen) await modal.requestFullscreen();
+          else if (modal.webkitRequestFullscreen) modal.webkitRequestFullscreen();
+        } catch (e) {}
+        const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+        if (isMobile) {
+          try {
+            if (screen.orientation?.lock) await screen.orientation.lock('landscape');
+            else throw new Error('no-orientation-api');
+          } catch (e) {
+            if (window.innerHeight > window.innerWidth) stage.classList.add('force-landscape');
+          }
+        }
+      }
+    });
+    const rotateBtn = $('#rotateBtn');
+    if (rotateBtn) rotateBtn.addEventListener('click', () => {
+      stage.classList.toggle('force-landscape');
+      if (stage.classList.contains('force-landscape')) { if (screen.orientation?.lock) screen.orientation.lock('landscape').catch(() => {}); }
+      else { if (screen.orientation?.unlock) { try { screen.orientation.unlock(); } catch (e) {} } }
+    });
+    $('#settingsBtn').addEventListener('click', e => { e.stopPropagation(); $('#playerSettingsMenu').classList.toggle('open'); });
+    $$('#playerSettingsMenu [data-speed]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const speed = parseFloat(btn.dataset.speed);
+        v.playbackRate = speed;
+        $$('#playerSettingsMenu [data-speed]').forEach(b => b.classList.toggle('active', b === btn));
+        $('#playerSettingsMenu').classList.remove('open');
+      });
+    });
+    document.addEventListener('click', e => {
+      if (!e.target.closest('#playerSettingsMenu') && !e.target.closest('#settingsBtn')) $('#playerSettingsMenu')?.classList.remove('open');
+    });
+    v.addEventListener('timeupdate', () => this.updateProgress());
+    v.addEventListener('progress', () => this.updateBuffered());
+    v.addEventListener('loadedmetadata', () => this.updateProgress());
+    v.addEventListener('play', () => { $('#playerBigPlay').classList.add('hidden'); this.updatePlayIcon(true); this.scheduleSkipIntro(); });
+    v.addEventListener('pause', () => { $('#playerBigPlay').classList.remove('hidden'); this.updatePlayIcon(false); });
+    v.addEventListener('ended', () => { this.markWatched(); $('#playerBigPlay').classList.remove('hidden'); });
+    stage.addEventListener('mousemove', () => this.showControlsTemp());
+    stage.addEventListener('click', (e) => this.handleStageInteraction(e));
+    $('#skipIntroBtn').addEventListener('click', () => {
+      if (this.currentMovie && this.currentMovie.skipIntro) this.video.currentTime = this.currentMovie.skipIntro;
+      $('#skipIntroBtn').classList.remove('show');
+    });
+    document.addEventListener('keydown', e => {
+      if (!$('#playerModal').classList.contains('active')) return;
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+      if (e.key === ' ') { e.preventDefault(); this.togglePlay(); }
+      else if (e.key === 'Escape') this.close();
+      else if (e.key === 'ArrowRight') v.currentTime = Math.min(v.duration || 0, v.currentTime + (App.settings?.skipSeconds || 10));
+      else if (e.key === 'ArrowLeft') v.currentTime = Math.max(0, v.currentTime - (App.settings?.skipSeconds || 10));
+      else if (e.key === 'f') $('#fullscreenBtn').click();
+      else if (e.key === 'm') { v.muted = !v.muted; this.updateVolumeIcon(); }
+    });
+  },
+  handleStageInteraction(e) {
+    const target = e.target;
+    if (target.closest('.player-controls') || target.closest('.player-topbar') || target.closest('.player-big-play') || target.closest('.skip-intro-btn') || target.closest('.player-settings-menu')) return;
+    const stage = $('#playerStage');
+    const rect = stage.getBoundingClientRect();
+    const clientX = e.clientX !== undefined ? e.clientX : (e.changedTouches ? e.changedTouches[0].clientX : 0);
+    const x = clientX - rect.left; const width = rect.width; const now = Date.now();
+    if (now - this._lastTapTime < 300) {
+      clearTimeout(this._tapTimer);
+      if (x < width * 0.3) { this.video.currentTime = Math.max(0, this.video.currentTime - 10); this.showSeekIndicator('-10s', 'left'); }
+      else if (x > width * 0.7) { this.video.currentTime = Math.min(this.video.duration || 0, this.video.currentTime + 10); this.showSeekIndicator('+10s', 'right'); }
+      this._tapTimer = null;
+    } else {
+      this._tapTimer = setTimeout(() => {
+        const isVisible = stage.classList.contains('controls-visible');
+        if (isVisible) { stage.classList.remove('controls-visible'); clearTimeout(this.hideControlsTimer); }
+        else { stage.classList.add('controls-visible'); this.showControlsTemp(); }
+      }, 300);
+    }
+    this._lastTapTime = now;
+  },
+  showSeekIndicator(text, side) {
+    const stage = $('#playerStage');
+    const el = document.createElement('div');
+    el.textContent = text;
+    el.style.cssText = `position:absolute;top:50%;${side === 'left' ? 'left:10%;' : 'right:10%;'}transform:translateY(-50%);background:rgba(0,0,0,0.6);color:#fff;padding:12px 24px;border-radius:8px;font-size:18px;font-weight:bold;pointer-events:none;z-index:10;backdrop-filter:blur(4px);`;
+    stage.appendChild(el);
+    setTimeout(() => el.remove(), 800);
+  },
+  open(movie) {
+    this.currentMovie = movie;
+    const v = this.video;
+    $('#playerTitle').textContent = movie.title;
+    const safeVideo = safeUrl(movie.videoUrl);
+    if (!safeVideo) { toast('رابط الفيديو غير متوفر', 'error'); return; }
+    v.src = safeVideo;
+    v.playbackRate = 1; v.muted = false; v.volume = 1;
+    $('#volumeSlider').value = '1';
+    $('#playerModal').classList.add('active');
+    document.body.classList.add('no-scroll');
+    this.updatePlayIcon(false); this.updateVolumeIcon(); this.resetSkipIntro(); this.showControlsTemp();
+    v.play().catch(() => {});
+  },
+  close() {
+    const v = this.video;
+    v.pause(); v.removeAttribute('src'); v.load();
+    $('#playerModal').classList.remove('active');
+    document.body.classList.remove('no-scroll');
+    $('#playerStage').classList.remove('force-landscape');
+    try { screen.orientation?.unlock?.(); } catch (e) {}
+    if (document.fullscreenElement) document.exitFullscreen?.().catch(() => {});
+    this.resetSkipIntro(); this._lastTapTime = 0; clearTimeout(this._tapTimer);
+  },
+  togglePlay() { const v = this.video; if (v.paused) v.play().catch(() => {}); else v.pause(); },
+  updatePlayIcon(isPlaying) { const use = $('#playPauseBtn use'); if (use) use.setAttribute('href', isPlaying ? '#i-pause' : '#i-play'); },
+  updateVolumeIcon() {
+    const v = this.video; const use = $('#volumeBtn use'); if (!use) return;
+    if (v.muted || v.volume === 0) use.setAttribute('href', '#i-vol-mute');
+    else if (v.volume < 0.5) use.setAttribute('href', '#i-vol-low');
+    else use.setAttribute('href', '#i-vol-high');
+  },
+  updateProgress() {
+    const v = this.video;
+    const pct = v.duration ? (v.currentTime / v.duration) * 100 : 0;
+    $('#progressPlayed').style.width = pct + '%';
+    $('#progressKnob').style.left = pct + '%';
+    $('#playerTime').textContent = formatTime(v.currentTime) + ' / ' + formatTime(v.duration);
+  },
+  updateBuffered() {
+    const v = this.video;
+    if (!v.buffered.length || !v.duration) return;
+    const end = v.buffered.end(v.buffered.length - 1);
+    $('#progressBuffered').style.width = (end / v.duration * 100) + '%';
+  },
+  showControlsTemp() {
+    const stage = $('#playerStage');
+    stage.classList.add('controls-visible');
+    clearTimeout(this.hideControlsTimer);
+    this.hideControlsTimer = setTimeout(() => { if (!this.video.paused) stage.classList.remove('controls-visible'); }, 5000);
+  },
+  scheduleSkipIntro() {
+    this.resetSkipIntro();
+    const v = this.video;
+    if (!this.currentMovie || !this.currentMovie.skipIntro) return;
+    this.skipIntroTimer = setTimeout(() => {
+      if (!v.paused && v.currentTime < this.currentMovie.skipIntro) $('#skipIntroBtn').classList.add('show');
+    }, 3000);
+  },
+  resetSkipIntro() { clearTimeout(this.skipIntroTimer); $('#skipIntroBtn').classList.remove('show'); },
+  async markWatched() {
+    if (!this.currentMovie || !App.user) return;
+    const watched = App.user.watched || [];
+    if (!watched.includes(this.currentMovie.id)) {
+      watched.push(this.currentMovie.id);
+      try { App.user = await Auth.updateUser(App.user.id, { watched }); App._profileStatsCache = null; } catch (err) {}
+    }
+  }
+};
+function playMovie(movieId) {
+  const movie = Videos.findById(movieId);
+  if (!movie) { toast('الفيلم غير موجود', 'error'); return; }
+  Player.open(movie);
+}
+
+/* ══════════════════════════════════════════════════════════
+   Support
+   ══════════════════════════════════════════════════════════ */
+function setupSupport() {
+  const btn = $('#sendSupportBtn'); if (!btn) return;
+  btn.addEventListener('click', () => {
+    const subject = sanitizeText($('#supportSubject').value, 100);
+    const body = sanitizeText($('#supportBody').value, 2000);
+    const resEl = $('#supportResult');
+    resEl.textContent = ''; resEl.className = 'err';
+    if (!subject || !body) { resEl.textContent = 'أدخل الموضوع والمحتوى'; return; }
+    const mailto = `mailto:foxkio.team@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body + '\n\n---\nمن: ' + App.user.username + ' (' + App.user.email + ')')}`;
+    window.location.href = mailto;
+    toast('تم فتح البريد لإرسال الرسالة', 'success');
+    resEl.className = 'ok';
+    resEl.textContent = 'إذا لم يفتح برنامج البريد، راسلنا مباشرة على foxkio.team@gmail.com';
+    $('#supportSubject').value = ''; $('#supportBody').value = '';
+  });
+}
+
+/* ══════════════════════════════════════════════════════════
+   App Events
+   ══════════════════════════════════════════════════════════ */
+function setupAppEvents() {
+  if (App._eventsBound) return;
+  App._eventsBound = true;
+
+  $$('.nav-btn[data-view], .mobile-nav button[data-view]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      App.searchOriginalView = null;
+      App.currentHashtag = null;
+      if (btn.dataset.view !== 'social') stopSocialPoll();
+      showView(btn.dataset.view);
+    });
+  });
+  const themeBtn = $('#themeToggle'); if (themeBtn) themeBtn.addEventListener('click', toggleTheme);
+  const logoutBtn = $('#logoutBtn');
+  if (logoutBtn) logoutBtn.addEventListener('click', async () => { if (confirm('تسجيل الخروج؟')) await logout(); });
+  const profLogoutBtn = $('#profileLogoutBtn');
+  if (profLogoutBtn) profLogoutBtn.addEventListener('click', async () => { if (confirm('تسجيل الخروج؟')) await logout(); });
+  const stLogoutBtn = $('#stLogoutBtn');
+  if (stLogoutBtn) stLogoutBtn.addEventListener('click', async () => { if (confirm('تسجيل الخروج؟')) await logout(); });
+
+  // Topbar avatar -> profile
+  const topbarAvatar = $('#topbarAvatar');
+  if (topbarAvatar) topbarAvatar.addEventListener('click', () => showView('profile'));
+
+  // Back from user profile
+  const backBtn = $('#backFromUserProfile');
+  if (backBtn) backBtn.addEventListener('click', goBackFromUserProfile);
+
+  const searchInput = $('#searchInput');
+  if (searchInput) {
+    searchInput.addEventListener('input', e => {
+      clearTimeout(App.searchDebounce);
+      App.searchDebounce = setTimeout(() => {
+        const q = e.target.value.trim().toLowerCase();
+        if (!q) { if (App.searchOriginalView) { const v = App.searchOriginalView; App.searchOriginalView = null; showView(v); } else showView(App.currentView); return; }
+        if (!App.searchOriginalView) App.searchOriginalView = App.currentView;
+        performSearch(q);
+      }, 300);
+    });
+  }
+
+  setupSettingsEvents();
+  setupSupport();
+
+  if (!App._peopleBound) {
+    App._peopleBound = true;
+    $$('[data-people-type]').forEach(btn => btn.addEventListener('click', () => {
+      App.peopleType = btn.dataset.peopleType;
+      renderPeopleView();
+      AppState.save();
+    }));
+  }
+
+  const profBtn = $('#profileAvatarBtn'); if (profBtn) profBtn.addEventListener('click', () => $('#profileAvatarInput').click());
+  const profInput = $('#profileAvatarInput');
+  if (profInput) profInput.addEventListener('change', async e => {
+    const file = e.target.files[0]; if (!file) return;
+    try {
+      const dataUrl = await fileToDataUrl(file, 400);
+      App.user = await Auth.updateUser(App.user.id, { avatar: dataUrl });
+      await refreshUserUI(); toast('تم تحديث الصورة الشخصية', 'success');
+    } catch (err) { toast(err.message, 'error'); }
+    e.target.value = '';
+  });
+
+  // Banner upload
+  const bannerBtn = $('#profileBannerBtn'); if (bannerBtn) bannerBtn.addEventListener('click', () => $('#profileBannerInput').click());
+  const bannerInput = $('#profileBannerInput');
+  if (bannerInput) bannerInput.addEventListener('change', async e => {
+    const file = e.target.files[0]; if (!file) return;
+    try {
+      const dataUrl = await fileToDataUrl(file, 1200);
+      App.user = await Auth.updateUser(App.user.id, { banner: dataUrl });
+      await refreshUserUI(); toast('تم تحديث البانر', 'success');
+    } catch (err) { toast(err.message, 'error'); }
+    e.target.value = '';
+  });
+
+  const saveBio = $('#saveBioBtn');
+  if (saveBio) saveBio.addEventListener('click', async () => {
+    const bio = sanitizeText($('#profileBio').value, 200);
+    try { App.user = await Auth.updateUser(App.user.id, { bio }); toast('تم الحفظ', 'success'); }
+    catch (err) { toast(err.message, 'error'); }
+  });
+
+  const postImgBtn = $('#postImageBtn'); if (postImgBtn) postImgBtn.addEventListener('click', () => $('#postImageInput').click());
+  const postImgInput = $('#postImageInput');
+  if (postImgInput) postImgInput.addEventListener('change', async e => {
+    const file = e.target.files[0]; if (!file) return;
+    try {
+      App.selectedPostImage = await fileToDataUrl(file, 800);
+      const preview = $('#postImagePreview');
+      preview.style.display = 'block';
+      preview.innerHTML = `<img src="${App.selectedPostImage}" alt=""><button class="remove" id="removePostImg" type="button">×</button>`;
+      $('#removePostImg').addEventListener('click', () => {
+        App.selectedPostImage = '';
+        preview.style.display = 'none'; preview.innerHTML = '';
+        $('#postImageInput').value = '';
+      });
+    } catch (err) { toast(err.message, 'error'); }
+    e.target.value = '';
+  });
+
+  const postSubmit = $('#postSubmitBtn');
+  if (postSubmit) postSubmit.addEventListener('click', async () => {
+    const text = sanitizeText($('#postContent').value, 500);
+    postSubmit.disabled = true;
+    try {
+      await Social.createPost(App.user, { text, image: App.selectedPostImage });
+      $('#postContent').value = '';
+      $('#postImagePreview').style.display = 'none'; $('#postImagePreview').innerHTML = '';
+      App.selectedPostImage = '';
+      App._socialLastHash = '';
+      await renderFeed();
+      toast('تم النشر', 'success');
+    } catch (err) { toast(err.message, 'error'); }
+    finally { postSubmit.disabled = false; }
+  });
+
+  Player.init();
+
+  document.addEventListener('click', async (e) => {
+    const hash = e.target.closest('[data-hashtag]');
+    if (hash) { e.preventDefault(); filterByHashtag(hash.dataset.hashtag); return; }
+    const mention = e.target.closest('[data-mention]');
+    if (mention) { e.preventDefault(); await showUserProfilePage(mention.dataset.mention); return; }
+    const followers = e.target.closest('[data-show-followers]');
+    if (followers) { e.preventDefault(); await showFollowList(followers.dataset.showFollowers, 'followers'); return; }
+    const following = e.target.closest('[data-show-following]');
+    if (following) { e.preventDefault(); await showFollowList(following.dataset.showFollowing, 'following'); return; }
+  });
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+      const dm = $('#detailModal');
+      if (dm && dm.classList.contains('active')) { dm.classList.remove('active'); document.body.classList.remove('no-scroll'); }
+    }
+  });
+
+  window.addEventListener('beforeunload', () => AppState.save());
+  window.addEventListener('pagehide', () => AppState.save());
+}
+
+function performSearch(query) {
+  const q = sanitizeText(query, 100).toLowerCase();
+  if (!q) return;
+  const results = Videos.cache.filter(v => {
+    const haystack = [v.title, v.description, v.studio, v.author, ...v.categories, ...v.actors.map(a => a.name)].join(' ').toLowerCase();
+    return haystack.includes(q);
+  });
+  showView('movies');
+  const chips = $('#movieChips'); const grid = $('#movieGrid');
+  if (chips) chips.innerHTML = `<button class="chip active" type="button">نتائج البحث: ${results.length}</button>`;
+  if (grid) { grid.innerHTML = results.length ? results.map(movieCardHtml).join('') : emptyState('لا توجد نتائج'); bindMovieCards(grid); }
+}
+
+/* ══════════════════════════════════════════════════════════
+   Session restore + init
+   ══════════════════════════════════════════════════════════ */
+async function loadUserFromSession(session) {
+  const userId = session.user.id;
+  const cached = Store.get('profile_cache_' + userId, null);
+  let profile = cached;
+  try {
+    const fresh = await sbFetchProfile(userId);
+    if (fresh) { profile = fresh; Store.set('profile_cache_' + userId, fresh); }
+    else if (!profile) {
+      const uname = (session.user.user_metadata && session.user.user_metadata.username) || session.user.email.split('@')[0];
+      const newProfile = await sbUpsertProfile(userId, uname, {
+        email: session.user.email, avatar_url: '', bio: '', watchlist: [], watched: [], last_username_change: 0
+      });
+      if (newProfile) { profile = newProfile; Store.set('profile_cache_' + userId, newProfile); }
+    }
+  } catch (e) { console.warn('Profile refresh failed, using cache', e); }
+  return profileToUser(session.user, profile);
+}
+
+async function init() {
+  Network.init();
+
+  const tabLogin = $('#tabLogin'); if (tabLogin) tabLogin.addEventListener('click', () => switchAuthTab('login'));
+  const tabReg = $('#tabRegister'); if (tabReg) tabReg.addEventListener('click', () => switchAuthTab('register'));
+  const fLogin = $('#formLogin'); if (fLogin) fLogin.addEventListener('submit', handleLogin);
+  const fReg = $('#formRegister'); if (fReg) fReg.addEventListener('submit', handleRegister);
+  const fPass = $('#forgotPasswordBtn'); if (fPass) fPass.addEventListener('click', openForgotPasswordModal);
+
+  if (USE_SUPABASE) {
+    supabaseClient.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_OUT' && App.user) {
+        App.user = null;
+        App.settings = null;
+        App._profileStatsCache = null;
+        try { localStorage.removeItem('foxkio_session_marker'); } catch (e) {}
+        showScreen('authScreen');
+      }
+    });
+  }
+
+  let restoredUser = null;
+  try {
+    if (USE_SUPABASE) {
+      const { data } = await supabaseClient.auth.getSession();
+      if (data && data.session) restoredUser = await loadUserFromSession(data.session);
+    } else {
+      const session = await Auth.getSession();
+      if (session) restoredUser = Auth.getUsers().find(u => u.id === session.userId) || null;
+    }
+  } catch (err) { console.warn('Init session error:', err); }
+
+  if (restoredUser) {
+    App.user = restoredUser;
+    App.settings = Settings.get(restoredUser.id);
+    applyTheme(App.settings.theme);
+    applyFont(App.settings.font);
+    try { localStorage.setItem('foxkio_session_marker', '1'); } catch (e) {}
+    hideSplash();
+    showScreen('appScreen');
+    await enterApp();
+  } else {
+    hideSplash();
+    showScreen('authScreen');
+    Videos.load();
+  }
+}
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+
+</body>
+</html>
